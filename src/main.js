@@ -179,13 +179,14 @@ function refreshHud() {
   clear(hud.passportStrip);
   clear(hud.passportList);
   for (const s of STATIONS) {
-    const earned = s.id !== 'badge' && save.hasStamp(s.id);
-    const locked = s.id === 'badge' && n < 6;
+    const badgeBuilt = s.id === 'badge' && isDriveUnlocked(save.data);
+    const earned = s.id === 'badge' ? badgeBuilt : save.hasStamp(s.id);
+    const locked = s.id === 'badge' && !badgeBuilt && n < 6;
     const slot = h('span', { class: `slot ${earned ? 'earned' : ''} ${locked ? 'locked' : ''}`, title: s.title, html: EMBLEMS[s.emblem] });
     if (earned) slot.append(h('span.slot-mark', { html: ICONS.check }));
     if (locked) slot.append(h('span.slot-mark', { html: ICONS.lock }));
     hud.passportStrip.append(slot);
-    const status = earned ? `Stamp earned: ${save.data.stations[s.id].stamp.skill}` : locked ? `Locked: ${n} of 6 stamps` : s.id === 'badge' ? 'Open' : 'No stamp yet';
+    const status = badgeBuilt ? 'Badge built' : earned ? `Stamp earned: ${save.data.stations[s.id].stamp.skill}` : locked ? `Locked: ${n} of 6 stamps` : s.id === 'badge' ? 'Open' : 'No stamp yet';
     hud.passportList.append(h('li', null,
       h('span.pl-icon', { html: EMBLEMS[s.emblem] }),
       h('span.pl-text', null, h('strong', { text: s.title }), h('span', { text: status })),
@@ -315,7 +316,8 @@ function updateRingLabels() {
       scene.add(l.sp);
       ringLabels.set(s.id, l);
     }
-    if (s.id === 'badge') drawLabel(l, s.title, n < 6 ? `Locked: ${n} of 6 stamps` : 'Open', n < 6 ? 'lock' : null);
+    if (s.id === 'badge' && isDriveUnlocked(save.data)) drawLabel(l, s.title, '✓ Badge built', 'check');
+    else if (s.id === 'badge') drawLabel(l, s.title, n < 6 ? `Locked: ${n} of 6 stamps` : 'Open', n < 6 ? 'lock' : null);
     else drawLabel(l, s.title, save.hasStamp(s.id) ? '✓ Stamp earned' : null, 'check');
   }
 }
