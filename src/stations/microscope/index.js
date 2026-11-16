@@ -45,6 +45,7 @@ export default function createMicroscopicMadness() {
 
   function start(c) {
     ctx = c;
+    ctx.setSheet?.('short');
     buildStage();
     ctx.onResize(layoutStage);
     onKey = (e) => {
@@ -79,22 +80,33 @@ export default function createMicroscopicMadness() {
     layoutStage();
   }
 
-  /** Fit the square image and the answers into the space left of the panel. */
+  /**
+   * Fit the square image and the answers into the space the panel leaves:
+   * left of a side panel, or above a bottom sheet on an upright phone.
+   */
   function layoutStage() {
     if (!stage) return;
-    const { width, height, panelWidth } = ctx.viewport();
-    const free = Math.max(240, width - panelWidth);
-    stage.style.right = `${panelWidth}px`;
-    const short = height < 560;
+    const { width, height, panelWidth, panelHeight = 0, safe = { t: 0, r: 0, b: 0, l: 0 } } = ctx.viewport();
+    const freeW = Math.max(240, width - panelWidth - safe.l - (panelWidth ? 0 : safe.r));
+    const freeH = Math.max(200, height - panelHeight - safe.t - (panelHeight ? 0 : safe.b));
+    stage.style.right = `${panelWidth || safe.r}px`;
+    stage.style.bottom = `${panelHeight || safe.b}px`;
+    stage.style.top = `${safe.t}px`;
+    stage.style.left = `${safe.l}px`;
+    // answers beside the picture when the free area is short and wide (a phone on its side)
+    const short = freeH < 560 && freeW > freeH * 1.15;
     stage.classList.toggle('mm-side', short);
-    const pad = short ? 8 : 16;
+    const narrow = !short && freeW < 480;
+    stage.classList.toggle('mm-narrow', narrow);
+    const pad = short || narrow ? 8 : 16;
     const side = 150;          // answer column width on short screens
+    const answersH = narrow ? 112 : 150;
     let size;
-    if (short) size = Math.min(height - pad * 2, free - pad * 2 - side - 8);
-    else size = Math.min(free - pad * 2, height - pad * 2 - 150 - 8);
+    if (short) size = Math.min(freeH - pad * 2, freeW - pad * 2 - side - 8);
+    else size = Math.min(freeW - pad * 2, freeH - pad * 2 - answersH - 8);
     size = Math.max(150, Math.floor(size));
     ui.frame.style.width = ui.frame.style.height = `${size}px`;
-    ui.answers.style.width = short ? `${side}px` : `${size}px`;
+    ui.answers.style.width = short ? `${side}px` : `${Math.max(size, Math.min(freeW - pad * 2, 420))}px`;
   }
 
   function setImage(stepIndex, animate) {

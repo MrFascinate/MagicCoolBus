@@ -36,3 +36,9 @@
 .mm-stage.mm-side .mm-key { display: none; }
 .mm-stage.mm-side .mm-answer { font-size: 16px; }
 @media (prefers-reduced-motion: reduce) { .mm-img-next.mm-out { animation: none; } }
+/* upright phones: picture above, answers in two columns under it, all above the bottom sheet */
+.mm-stage.mm-narrow { padding: 8px; }
+.mm-stage.mm-narrow .mm-card { gap: 6px; }
+.mm-stage.mm-narrow .mm-answers { gap: 6px; }
+.mm-stage.mm-narrow .mm-answer { min-height: 48px; padding: 4px 8px; font-size: 16px; }
+.mm-stage.mm-narrow .mm-key { display: none; }

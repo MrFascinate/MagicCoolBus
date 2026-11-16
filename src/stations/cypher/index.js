@@ -71,6 +71,7 @@ export default function createScienceCypher() {
 
   function start(c) {
     ctx = c;
+    ctx.setSheet?.('short');
     buildStage();
     placeAvatar();
     frameCamera();
@@ -143,10 +144,29 @@ export default function createScienceCypher() {
     const sc = ctx.hub.pos('stage_center');
     const cam = ctx.camera;
     if (!camSaved) camSaved = { p: cam.position.clone(), q: cam.quaternion.clone() };
-    const { height } = ctx.viewport();
+    const { height, panelHeight = 0, safe = { t: 0 } } = ctx.viewport();
     const short = height < 560;
     const bar = stage && !stage.hidden ? ui.bar?.getBoundingClientRect() : null;
     let free;
+    if (panelHeight > 0) {
+      // An upright phone: the panel is a sheet along the bottom and the camera's centre line
+      // sits in the middle of the area above it (see layout.js). Stand back so the whole
+      // character fits in the band between the top of the screen and the lyric bar,
+      // then tilt so the character sits in the middle of that band.
+      const fullH = height + panelHeight;
+      const f = (fullH / 2) / Math.tan((cam.fov * Math.PI) / 360);   // focal length in CSS pixels
+      const axisY = (height - panelHeight) / 2;                       // where the centre line lands
+      const top = safe.t + 6, bottom = bar && bar.top > top + 80 ? bar.top - 6 : height - panelHeight;
+      const tall = avatarHeight() + 0.35;
+      const dist = Math.max(2.2, Math.min(9, (tall * f) / Math.max(60, bottom - top)));
+      const mid = sc.y + tall / 2 - 0.15;
+      const dir = new THREE.Vector3(0.18, 0, 1).normalize();
+      cam.position.set(sc.x + dir.x * dist, mid, sc.z + dir.z * dist);
+      cam.lookAt(sc.x - 0.05, mid, sc.z);
+      cam.rotateX(-Math.atan((axisY - (top + bottom) / 2) / f));
+      cam.updateMatrixWorld(true);
+      return;
+    }
     if (short) {
       // A phone on its side: the lyric bar takes about 170 px whatever the line says, so
       // keep the camera steady and stand back far enough that the whole character,
@@ -210,13 +230,17 @@ export default function createScienceCypher() {
 
   function layoutStage() {
     if (!stage) return;
-    const { width, height, panelWidth } = ctx.viewport();
-    stage.style.right = `${panelWidth}px`;
-    stage.classList.toggle('cy-short', height < 560);
-    const w = Math.max(220, Math.min(width - panelWidth - 24, 860));
+    const { width, height, panelWidth, panelHeight = 0, safe = { t: 0, r: 0, b: 0, l: 0 } } = ctx.viewport();
+    stage.style.right = `${panelWidth || safe.r}px`;
+    stage.style.bottom = `${panelHeight || safe.b}px`;
+    stage.style.left = `${safe.l}px`;
+    const short = height - panelHeight < 560;
+    stage.classList.toggle('cy-short', short);
+    stage.classList.toggle('cy-narrow', panelHeight > 0);
+    const w = Math.max(220, Math.min(width - panelWidth - safe.l - safe.r - (short ? 12 : 24), 860));
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     // the canvas sits inside the bar's padding and border (12 + 4 px a side, 8 + 3 on short screens)
-    cw = w - (height < 560 ? 22 : 32); chh = height < 560 ? 40 : 76;
+    cw = w - (short ? 22 : 32); chh = short ? 40 : 76;
     canvas.width = Math.round(cw * dpr); canvas.height = Math.round(chh * dpr);
     canvas.style.width = `${cw}px`; canvas.style.height = `${chh}px`;
     ui.bar.style.width = `${w}px`;

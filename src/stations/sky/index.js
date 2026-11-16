@@ -127,13 +127,40 @@ export default function createSkySeeker() {
   function layout() {
     if (!stage) return;
     const vp = ctx.viewport();
-    const w = vp.width - vp.panelWidth, ht = vp.height;
-    const short = ht <= 520;
-    const sideW = short ? 118 : 150;
-    const d = Math.max(200, Math.floor(Math.min(w - sideW - (short ? 22 : 48), ht - (short ? 16 : 40))));
-    stage.style.right = `${vp.panelWidth}px`;
+    const safe = vp.safe || { t: 0, r: 0, b: 0, l: 0 };
+    const ph = vp.panelHeight || 0;
+    const w = vp.width - vp.panelWidth - safe.l - (vp.panelWidth ? 0 : safe.r);
+    const ht = vp.height - ph - safe.t - (ph ? 0 : safe.b);
+    stage.style.right = `${vp.panelWidth || safe.r}px`;
+    stage.style.bottom = `${ph || safe.b}px`;
+    stage.style.top = `${safe.t}px`;
+    stage.style.left = `${safe.l}px`;
+    // an upright phone (bottom sheet): the eyepiece on top, the buttons in rows under it
+    const tall = ph > 0;
+    stage.classList.toggle('sky-tall', tall);
+    const short = !tall && ht <= 520;
+    // a phone on its side has no room for the "Lost?" tip in the button column: it sits on the eyepiece
+    const tipHome = short ? ui.scope : ui.side;
+    if (ui.lostTip.parentElement !== tipHome) {
+      if (tipHome === ui.side) ui.side.insertBefore(ui.lostTip, ui.confirm); else ui.scope.append(ui.lostTip);
+    }
+    let d;
+    if (tall) {
+      ui.side.style.width = `${Math.min(w - 16, 400)}px`;
+      // measure the rows with the "Lost?" tip showing, so the eyepiece keeps its size when it comes and goes
+      const tipHidden = ui.lostTip.hidden;
+      ui.lostTip.hidden = false;
+      const sideH = stage.hidden ? 150 : ui.side.offsetHeight;
+      ui.lostTip.hidden = tipHidden;
+      d = Math.max(160, Math.floor(Math.min(w - 24, ht - sideH - 24)));
+    } else {
+      const sideW = short ? 118 : 150;
+      d = Math.max(short ? 160 : 200, Math.floor(Math.min(w - sideW - (short ? 22 : 48), ht - (short ? 16 : 40))));
+      ui.side.style.width = `${sideW}px`;
+    }
     ui.scope.style.width = ui.scope.style.height = `${d}px`;
-    ui.side.style.width = `${sideW}px`;
+    // on a small eyepiece the tip goes under it, where there is room, so it covers no arrows
+    ui.lostTip.classList.toggle('below', short && (ht - d) / 2 >= 64);
     sizeCss = d;
     sizePx = Math.round(d * Math.min(window.devicePixelRatio || 1, 1.5));
     canvas.width = canvas.height = sizePx;
@@ -217,6 +244,7 @@ export default function createSkySeeker() {
 
   function start(c) {
     ctx = c;
+    ctx.setSheet?.('short');
     buildStage();
     ctx.onResize(layout);
     ctx.panel.classList.add('sky');
@@ -456,6 +484,7 @@ export default function createSkySeeker() {
   /** The eyepiece covers the 3D view, so stop drawing the hub behind it (a big saving on Chromebooks). */
   function showStage() {
     stage.hidden = false;
+    if (stage.classList.contains('sky-tall')) layout();
     ctx.hub.root.visible = false;
     dirty = true;
   }

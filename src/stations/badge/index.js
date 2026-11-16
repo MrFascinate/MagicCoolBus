@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import './badge.css';
 import { h, clear, announce } from '../../ui/dom.js';
+import { fitBox, inBox } from '../../ui/layout.js';
 import { icon, starRow } from '../../ui/icons.js';
 import { EMBLEMS as STAMP_ICONS } from '../../ui/emblems.js';
 import { DEBUG } from '../../core/env.js';
@@ -72,11 +73,12 @@ export default function createBadgeBuilder() {
     const pts = [];
     for (const x of [-0.08, 0.08]) for (const y of [-0.03, 0.075]) for (const z of [-0.07, 0.07]) pts.push(new THREE.Vector3(look.x + x, look.y + y, look.z + z));
     const v = new THREE.Vector3();
+    const box = fitBox(ctx.viewport(), 0.9, 0.86);
     const fits = (d) => {
       cam.position.copy(look).addScaledVector(viewDir, d);
       cam.lookAt(look);
       cam.updateMatrixWorld(true);
-      return pts.every((p) => { v.copy(p).project(cam); return Math.abs(v.x) <= 0.9 && Math.abs(v.y) <= 0.86; });
+      return pts.every((p) => { v.copy(p).project(cam); return inBox(v, box); });
     };
     let lo = 0.12, hi = 6;
     for (let i = 0; i < 24; i++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }
@@ -97,6 +99,7 @@ export default function createBadgeBuilder() {
     ctx.onResize(() => { cameraTarget(); if (!camTween) { ctx.camera.position.copy(camToPos); ctx.camera.quaternion.copy(camToQ); } });
     window.addEventListener('pointermove', onDragMove);
     window.addEventListener('pointerup', onDragEnd);
+    window.addEventListener('pointercancel', onDragCancel);
     showDesignOnBed(myDesign, 'flat', 0);
     showLevelSelect();
     if (DEBUG) window.__mcbBadge = { get sim() { return sim; }, get orientation() { return orientation; }, get turn() { return turn; }, camera: ctx.camera };
@@ -388,6 +391,13 @@ export default function createBadgeBuilder() {
       setTimeout(() => { drag = null; }, 0);
       return;
     }
+    drag = null;
+  }
+
+  /** The browser took the touch over (or it was interrupted): drop the drag, place nothing. */
+  function onDragCancel() {
+    if (!drag) return;
+    drag.ghost?.remove();
     drag = null;
   }
 
@@ -714,6 +724,7 @@ export default function createBadgeBuilder() {
     drag = null;
     window.removeEventListener('pointermove', onDragMove);
     window.removeEventListener('pointerup', onDragEnd);
+    window.removeEventListener('pointercancel', onDragCancel);
     printer?.dispose();
     printer = null;
     ui = {};

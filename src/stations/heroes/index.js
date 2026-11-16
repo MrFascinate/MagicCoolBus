@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import './heroes.css';
 import content from './content.json';
 import { h, clear, announce } from '../../ui/dom.js';
+import { fitBox, inBox } from '../../ui/layout.js';
 import { icon, starRow } from '../../ui/icons.js';
 import { DEBUG } from '../../core/env.js';
 import { createLevelRun, isUnlocked } from './logic.js';
@@ -174,11 +175,12 @@ export default function createHologramHeroes() {
       pts.push(new THREE.Vector3(look.x + rowDir.x * a - rowDir.z * b, look.y + y, look.z + rowDir.z * a + rowDir.x * b));
     }
     const v = new THREE.Vector3();
+    const box = fitBox(ctx.viewport(), 0.92, 0.86);
     const fits = (d) => {
       cam.position.copy(look).addScaledVector(viewDir, d);
       cam.lookAt(look);
       cam.updateMatrixWorld(true);
-      return pts.every((p) => { v.copy(p).project(cam); return Math.abs(v.x) <= 0.92 && Math.abs(v.y) <= 0.86; });
+      return pts.every((p) => { v.copy(p).project(cam); return inBox(v, box); });
     };
     let lo = 0.6, hi = 12;
     for (let i = 0; i < 24; i++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }
@@ -293,7 +295,8 @@ export default function createHologramHeroes() {
     const moved = Math.hypot(e.clientX - pointerDown.x, e.clientY - pointerDown.y);
     pointerDown = null;
     if (moved > 12) return;
-    ndc.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+    const vp = ctx.viewport();
+    ndc.set((e.clientX / vp.width) * 2 - 1, -(e.clientY / vp.height) * 2 + 1);
     ray.setFromCamera(ndc, ctx.camera);
     ray.camera = ctx.camera;
     hits.length = 0;
@@ -590,7 +593,8 @@ export default function createHologramHeroes() {
     const v = hd.wrap.position.clone();
     v.y += hd.height * 0.5;
     v.project(ctx.camera);
-    return { x: ((v.x + 1) / 2) * window.innerWidth, y: ((1 - v.y) / 2) * window.innerHeight };
+    const vp = ctx.viewport();
+    return { x: ((v.x + 1) / 2) * vp.width, y: ((1 - v.y) / 2) * vp.height };
   }
 
   return { id: 'heroes', title: content.title, load, start, update, dispose };

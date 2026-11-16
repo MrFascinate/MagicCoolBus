@@ -1,14 +1,14 @@
 /* Drive the Bus HUD. Ships in the drive chunk only. */
 .drive-hud { position: absolute; inset: 0; pointer-events: none !important; outline: none; }
 .drive-hud > * { pointer-events: auto; }
-.dr-park { position: absolute; top: 10px; left: 10px; font-size: 18px; padding: 8px 16px; min-height: 52px; }
+.dr-park { position: absolute; top: calc(10px + var(--sa-t)); left: calc(10px + var(--sa-l)); font-size: 18px; padding: 8px 16px; min-height: 52px; }
 .dr-park .dr-ico { width: 26px; height: 26px; display: inline-flex; }
 .dr-ico svg { width: 100%; height: 100%; }
-.dr-help { position: absolute; left: 50%; top: 74px; transform: translateX(-50%); margin: 0; max-width: min(560px, calc(100vw - 420px)); background: rgba(15,27,61,0.85); color: #fff; padding: 8px 14px; border-radius: 10px; text-align: center; font-size: 16px; pointer-events: none !important; }
-.dr-status { position: absolute; left: 50%; top: 132px; transform: translateX(-50%); margin: 0; max-width: calc(100vw - 40px); background: #fff; border: 3px dashed var(--navy); border-radius: 12px; padding: 8px 14px; font-size: 17px; font-weight: 700; }
+.dr-help { position: absolute; left: 50%; top: calc(74px + var(--sa-t)); transform: translateX(-50%); margin: 0; max-width: min(560px, calc(100vw - 420px)); background: rgba(15,27,61,0.85); color: #fff; padding: 8px 14px; border-radius: 10px; text-align: center; font-size: 16px; pointer-events: none !important; }
+.dr-status { position: absolute; left: 50%; top: calc(132px + var(--sa-t)); transform: translateX(-50%); margin: 0; max-width: calc(100vw - 40px); background: #fff; border: 3px dashed var(--navy); border-radius: 12px; padding: 8px 14px; font-size: 17px; font-weight: 700; }
 .dr-beep { position: absolute; left: 50%; top: 32%; transform: translateX(-50%); margin: 0; background: #fff7d6; border: 3px solid var(--navy); border-radius: 18px; padding: 6px 16px; font-size: 20px; font-weight: 800; pointer-events: none !important; }
-.dr-steer { position: absolute; left: 14px; bottom: 14px; display: flex; gap: 12px; }
-.dr-pedals { position: absolute; right: 14px; bottom: 14px; display: grid; grid-template-columns: repeat(2, auto); gap: 12px; }
+.dr-steer { position: absolute; left: calc(14px + var(--sa-l)); bottom: calc(14px + var(--sa-b)); display: flex; gap: 12px; }
+.dr-pedals { position: absolute; right: calc(14px + var(--sa-r)); bottom: calc(14px + var(--sa-b)); display: grid; grid-template-columns: repeat(2, auto); gap: 12px; }
 .dr-pad { width: 88px; height: 88px; flex-direction: column; gap: 2px; padding: 4px; font-size: 16px; font-weight: 800; background: rgba(255,255,255,0.92); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .dr-pad .dr-ico { width: 38px; height: 38px; display: inline-flex; }
 .dr-pad.down { background: var(--navy); color: #fff; transform: translateY(2px); }
@@ -17,13 +17,23 @@
 .dr-pad.down .dr-ico { color: #fff; }
 /* phones on their side */
 @media (max-height: 520px) {
-  .dr-pad { width: 70px; height: 70px; font-size: 15px; }
+  .dr-pad { width: 72px; height: 72px; font-size: 16px; }
   .dr-pad .dr-ico { width: 28px; height: 28px; }
-  .dr-steer { left: 10px; bottom: 10px; gap: 10px; }
-  .dr-pedals { right: 10px; bottom: 10px; gap: 8px; }
+  .dr-steer { left: calc(10px + var(--sa-l)); bottom: calc(10px + var(--sa-b)); gap: 10px; }
+  .dr-pedals { right: calc(10px + var(--sa-r)); bottom: calc(10px + var(--sa-b)); gap: 8px; }
   .dr-help { display: none; }
   .dr-park { font-size: 16px; min-height: 46px; padding: 6px 12px; }
-  .dr-status { top: 64px; font-size: 16px; max-width: calc(100vw - 260px); }
+  .dr-status { top: calc(64px + var(--sa-t)); font-size: 16px; max-width: calc(100% - 260px - var(--sa-l) - var(--sa-r)); }
+}
+/* phones held upright: smaller pads so both groups fit side by side under the thumbs */
+@media (max-width: 599px) {
+  .dr-pad { width: 72px; height: 72px; font-size: 16px; }
+  .dr-pad .dr-ico { width: 30px; height: 30px; }
+  .dr-steer { left: calc(8px + var(--sa-l)); bottom: calc(12px + var(--sa-b)); gap: 8px; }
+  .dr-pedals { right: calc(8px + var(--sa-r)); bottom: calc(12px + var(--sa-b)); gap: 8px; }
+  .dr-help { display: none; }
+  .dr-status { top: calc(132px + var(--sa-t)); left: calc(10px + var(--sa-l)); right: calc(66px + var(--sa-r)); transform: none; max-width: none; font-size: 16px; }
+  .dr-park { font-size: 16px; }
 }
 @media (pointer: coarse) { .dr-help { display: none; } }
 @media (prefers-reduced-motion: reduce) { .dr-pad.down { transform: none; } }

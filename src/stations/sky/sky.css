@@ -43,13 +43,24 @@
 @media (max-height: 520px) {
   .sky-stage { gap: 6px; padding: 6px; }
   .sky-arrow { width: 44px; height: 44px; min-width: 44px; font-size: 18px; }
-  .sky-zoom { padding: 2px 4px; min-height: 40px; }
+  .sky-zoom { padding: 2px 4px; min-height: 44px; }
   .sky-zoom-fov { display: none; }
   .sky-zooms { padding: 4px; gap: 4px; }
   .sky-side { gap: 5px; }
-  .sky-toggle, .sky-confirm { min-height: 40px; padding: 4px 8px; }
+  .sky-toggle, .sky-confirm { min-height: 44px; padding: 4px 8px; }
   .sky-chart { max-width: 200px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sky-zoom.pulse { animation: none; }
 }
+/* upright phones: the eyepiece on top, the buttons in rows under it, all above the bottom sheet */
+.sky-stage.sky-tall { flex-direction: column; justify-content: flex-start; gap: 8px; padding: 8px; }
+.sky-stage.sky-tall .sky-side { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 6px; }
+.sky-stage.sky-tall .sky-zooms { flex-direction: row; padding: 3px; gap: 4px; }
+.sky-stage.sky-tall .sky-zoom { min-width: 64px; padding: 2px 8px; }
+.sky-stage.sky-tall .sky-zoom-fov { display: none; }
+.sky-stage.sky-tall .sky-lost { flex-basis: 100%; text-align: center; }
+.sky-stage.sky-tall .sky-confirm, .sky-stage.sky-tall .sky-toggle { padding: 4px 10px; }
+/* phones on their side: the "Lost?" tip sits on the eyepiece, above the down arrow */
+.sky-scope .sky-lost { position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); width: max-content; max-width: 84%; text-align: center; z-index: 1; }
+.sky-scope .sky-lost.below { bottom: auto; top: calc(100% + 8px); max-width: 190px; }

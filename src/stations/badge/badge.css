@@ -39,3 +39,5 @@
 .bb-overlay-art svg { width: min(420px, 80vw, 62vh); height: auto; }
 .bb-overlay-code { font: 800 30px/1.2 ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; letter-spacing: 0.08em; margin: 6px 0; }
 .bb-overlay-card .actions { justify-content: center; }
+/* a finger on an emblem drags it, so the panel does not scroll from there */
+.bb-emblem { touch-action: none; }

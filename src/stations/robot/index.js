@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import './robot.css';
 import { h, clear, announce } from '../../ui/dom.js';
+import { fitBox, inBox } from '../../ui/layout.js';
 import { icon, starRow } from '../../ui/icons.js';
 import { createBlockQueue } from '../../ui/blockQueue.js';
 import { LEVELS, STAMP_SKILL, PARTS, BINS, TRAY } from './levels.js';
@@ -206,13 +207,14 @@ export default function createRobotRelay() {
     const side = pose.position.clone().sub(look).setY(0);
     if (side.lengthSq() < 1e-6) side.set(0, 0, 1);
     side.normalize();
+    const box = fitBox(ctx.viewport(), 0.86, 0.8);
     const dir = side.multiplyScalar(Math.cos(PITCH)).setY(Math.sin(PITCH)).normalize();
     const v = new THREE.Vector3();
     const fits = (d) => {
       cam.position.copy(look).addScaledVector(dir, d);
       cam.lookAt(look);
       cam.updateMatrixWorld(true);
-      return pts.every((p) => { v.copy(p).project(cam); return Math.abs(v.x) <= 0.86 && Math.abs(v.y) <= 0.8 && v.z < 1; });
+      return pts.every((p) => { v.copy(p).project(cam); return inBox(v, box) && v.z < 1; });
     };
     let lo = 0.6, hi = 10;
     for (let i = 0; i < 24; i++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }

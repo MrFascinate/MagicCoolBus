@@ -28,7 +28,9 @@
  * @property {{play:(name:string)=>void}} sound
  * @property {boolean} reducedMotion
  * @property {(url:string) => Promise<any>} loadGLTF
- * @property {() => {width:number, height:number, panelWidth:number}} viewport
+ * @property {() => {width:number, height:number, panelWidth:number, panelHeight:number, safe:{t:number,r:number,b:number,l:number}}} viewport
+ *   panelWidth: a side panel's width (landscape); panelHeight: a bottom sheet's height (portrait). One of them is 0.
+ * @property {(size:'short'|'normal'|'tall') => void} [setSheet]  portrait sheet height; 'short' gives the station's own view more room
  * @property {(fn: () => void) => void} onResize
  * @property {(skill:string) => void} showStamp          shell shows the stamp card
  * @property {() => void} exit                           back to the hub

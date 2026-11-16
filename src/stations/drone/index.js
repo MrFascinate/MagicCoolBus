@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { h, clear, announce } from '../../ui/dom.js';
+import { fitBox, inBox } from '../../ui/layout.js';
 import { icon, starRow } from '../../ui/icons.js';
 import { createBlockQueue } from '../../ui/blockQueue.js';
 import { LEVELS, STAMP_SKILL } from './levels.js';
@@ -115,11 +116,12 @@ export default function createDroneDash() {
     const half = 1.25 + 0.2;
     const corners = [[-half, -half], [half, -half], [half, half], [-half, half]].map(([x, z]) => new THREE.Vector3(look.x + x, look.y, look.z + z));
     const v = new THREE.Vector3();
+    const box = fitBox(ctx.viewport(), 0.94, 0.92);
     const fits = (d) => {
       cam.position.copy(look).addScaledVector(dir, d);
       cam.lookAt(look);
       cam.updateMatrixWorld(true);
-      return corners.every((c) => { v.copy(c).project(cam); return Math.abs(v.x) <= 0.94 && Math.abs(v.y) <= 0.92; });
+      return corners.every((c) => { v.copy(c).project(cam); return inBox(v, box); });
     };
     let lo = 1.5, hi = 14;
     for (let i = 0; i < 24; i++) { const mid = (lo + hi) / 2; if (fits(mid)) hi = mid; else lo = mid; }

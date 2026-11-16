@@ -4,6 +4,8 @@ import { loadHub } from './hub/hub.js';
 import { PlayerController, FollowCamera } from './hub/player.js';
 import { loadRoster, createAvatar } from './avatars/roster.js';
 import { createSave, isDriveUnlocked } from './core/save.js';
+import { isDemoUrl, createDemoSave, exitDemoUrl } from './core/demo.js';
+import { panelInset, stationView, hubFov, pixelRatioFor, BASE_FOV } from './ui/layout.js';
 import { createSound } from './core/sound.js';
 import { reducedMotion, DEBUG } from './core/env.js';
 import { loadGLTF } from './core/loaders.js';
@@ -21,11 +23,19 @@ const DOOR_STEP = { x: 4.78, z: 1.45 };
 const BUS_PARKED = { x: 0.059, z: 0, h: Math.PI / 2 };
 const ui = /** @type {HTMLElement} */ (document.getElementById('ui'));
 const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('view'));
-const save = createSave();
+/** Demo mode (?demo=<key>): everything open, its own save in memory only. */
+const DEMO = isDemoUrl(location.search);
+const save = DEMO ? createDemoSave() : createSave();
 const sound = createSound(save.data.sound);
 const reduced = reducedMotion();
 
 /** @type {Mode} */ let mode = 'loading';
+/** Set the mode and mirror it on <html> for the stylesheet (mode-hub, mode-station, mode-drive). */
+function setMode(m) {
+  mode = m;
+  const cl = document.documentElement.classList;
+  for (const k of ['loading', 'select', 'hub', 'station', 'drive']) cl.toggle(`mode-${k}`, k === m);
+}
 let paused = false;
 /** @type {import('./hub/hub.js').Hub} */ let hub;
 /** @type {PlayerController} */ let player;
@@ -44,7 +54,10 @@ try {
   fatal('This game needs WebGL, and this browser could not start it. Try turning on hardware acceleration in the browser settings.');
   throw e;
 }
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+const touchOnly = typeof matchMedia === 'function' && matchMedia('(hover: none) and (pointer: coarse)').matches;
+/** times the frame rate fell under target; each one lowers the pixel ratio a step */
+let slowSteps = 0;
+renderer.setPixelRatio(pixelRatioFor(window.devicePixelRatio, window.innerWidth * window.innerHeight, 0, touchOnly));
 renderer.shadowMap.enabled = false;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x9fd3ff);
@@ -53,29 +66,65 @@ scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f7a, 1.6));
 const sun = new THREE.DirectionalLight(0xffffff, 1.5);
 sun.position.set(-6, 12, 9);
 scene.add(sun);
-const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 150);
+const camera = new THREE.PerspectiveCamera(BASE_FOV, 1, 0.1, 150);
 camera.position.set(1.5, 6, 22);
 camera.lookAt(1.5, 1, 4);
 
-function panelWidth() {
+const appEl = /** @type {HTMLElement} */ (document.getElementById('app'));
+/** Size of the game area in CSS pixels (follows the phone's address bar as it shows and hides). */
+function screenSize() {
+  const r = appEl.getBoundingClientRect();
+  return { w: Math.max(1, Math.round(r.width) || window.innerWidth), h: Math.max(1, Math.round(r.height) || window.innerHeight) };
+}
+
+/** What the station panel covers: a side panel (right) or a bottom sheet (bottom). */
+function panelCover() {
   const p = document.getElementById('station-panel');
-  if (!p || p.hidden) return 0;
-  const r = p.getBoundingClientRect();
-  return r.left > window.innerWidth * 0.3 ? r.width : 0; // side panel only
+  if (!p || p.hidden) return { right: 0, bottom: 0 };
+  const { w, h: ht } = screenSize();
+  return panelInset(p.getBoundingClientRect(), w, ht);
+}
+function panelWidth() { return panelCover().right; }
+
+/** Safe-area insets in CSS pixels (notch, rounded corners, gesture bar), read from a hidden probe. */
+const saProbe = h('div', { 'aria-hidden': 'true', style: { position: 'fixed', left: '0', top: '0', width: '0', height: '0', visibility: 'hidden', pointerEvents: 'none',
+  paddingTop: 'env(safe-area-inset-top, 0px)', paddingRight: 'env(safe-area-inset-right, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)', paddingLeft: 'env(safe-area-inset-left, 0px)' } });
+document.body.append(saProbe);
+function safeArea() {
+  const cs = getComputedStyle(saProbe);
+  return { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 };
 }
 
 function resize() {
-  const w = window.innerWidth, ht = window.innerHeight;
+  const { w, h: ht } = screenSize();
+  renderer.setPixelRatio(pixelRatioFor(window.devicePixelRatio, w * ht, slowSteps, touchOnly));
   renderer.setSize(w, ht, false);
-  camera.aspect = w / ht;
-  const pw = mode === 'station' ? panelWidth() : 0;
-  if (pw > 0) camera.setViewOffset(w + pw, ht, pw, 0, w, ht);
-  else camera.clearViewOffset();
-  camera.aspect = pw > 0 ? (w + pw) / ht : w / ht;
+  document.documentElement.classList.toggle('portrait', ht > w);
+  if (mode === 'station') {
+    const v = stationView(w, ht, panelCover());
+    if (v.offset) camera.setViewOffset(v.fullW, v.fullH, v.x, v.y, w, ht);
+    else camera.clearViewOffset();
+    camera.aspect = v.aspect;
+    camera.fov = v.fov;
+  } else {
+    camera.clearViewOffset();
+    camera.aspect = w / ht;
+    camera.fov = hubFov(w / ht);
+  }
   camera.updateProjectionMatrix();
   for (const f of resizeHandlers) f();
 }
-window.addEventListener('resize', resize);
+/** Resize now, on the next frame and once more a moment later: phones report the new size late after a rotation. */
+let resizeTimer = 0;
+function queueResize() {
+  resize();
+  requestAnimationFrame(resize);
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(resize, 350);
+}
+window.addEventListener('resize', queueResize);
+window.addEventListener('orientationchange', queueResize);
+window.visualViewport?.addEventListener('resize', queueResize);
 
 // ---------- screens ----------
 function fatal(text) {
@@ -141,7 +190,7 @@ function selectScreen(roster) {
       h('h2', { text: 'Pick your character' }),
       grid,
       h('div.actions', null, startBtn),
-      h('p.small', { text: save.persistent ? 'Your progress saves in this browser on this device only.' : 'This browser is not saving progress, so it will reset when you close the page.' }),
+      h('p.small', { text: DEMO ? 'Demo mode: every station is open and nothing is saved.' : save.persistent ? 'Your progress saves in this browser on this device only.' : 'This browser is not saving progress, so it will reset when you close the page.' }),
     )));
     (grid.querySelector('[tabindex="0"]'))?.focus();
   });
@@ -159,14 +208,20 @@ function buildHud() {
   hud.pauseBtn = h('button.icon-btn', { type: 'button', 'aria-label': 'Pause', onclick: () => setPaused(true) }, icon('pause'), h('span.btn-text', { text: 'Pause' }));
   hud.runBtn = h('button.icon-btn.run-btn', { type: 'button', 'aria-pressed': 'false', onclick: toggleRun }, icon('run'), h('span.btn-text', { text: 'Run: off' }));
   hud.top = h('div.topbar', null, hud.runBtn, hud.soundBtn, hud.pauseBtn);
+  if (DEMO) buildDemoMenu();
   hud.prompt = h('div.prompt', { hidden: true, role: 'status' });
-  hud.hint = h('p.hint', { text: 'Click or tap the ground to walk. Double-click or double-tap to run. Arrow keys or W A S D walk; hold Shift to run.' });
+  hud.hint = h('p.hint', null,
+    h('span.hint-mouse', { text: 'Click or tap the ground to walk. Double-click or double-tap to run. Arrow keys or W A S D walk; hold Shift to run.' }),
+    h('span.hint-touch', { text: 'Tap the ground to walk there. Double-tap to run.' }));
   hud.panelBody = h('div.panel-body');
   hud.panelBack = h('button.back-btn', { type: 'button', onclick: () => exitStation() }, icon('back'), h('span', { text: 'Back to the bus' }));
-  hud.panel = h('aside#station-panel', { hidden: true, 'aria-label': 'Station' }, h('div.panel-top', null, hud.panelBack), hud.panelBody);
+  hud.panelTop = h('div.panel-top', null, hud.panelBack);
+  hud.panel = h('aside#station-panel', { hidden: true, 'aria-label': 'Station' }, hud.panelTop, hud.panelBody);
   hud.overlay = h('div.overlay', { hidden: true });
   hud.toast = h('div.toast', { hidden: true, role: 'status' });
-  ui.append(hud.passport, hud.top, hud.prompt, hud.hint, hud.toast, hud.panel, hud.overlay);
+  hud.left = h('div.hud-left', null, hud.passport, hud.demo || null);
+  ui.append(hud.left, hud.top, hud.prompt, hud.hint, hud.toast, hud.panel, hud.overlay);
+  setMode(mode);
   refreshHud();
 }
 
@@ -175,7 +230,8 @@ function stampCount() { return save.stampCount(STAMP_STATIONS); }
 function refreshHud() {
   const n = stampCount();
   clear(hud.passportBtn);
-  hud.passportBtn.append(h('span', { text: `Passport: ${n} of 6 stamps` }));
+  hud.passportBtn.setAttribute('aria-label', `Passport: ${n} of 6 stamps`);
+  hud.passportBtn.append(icon('stamp'), h('span.pp-long', { text: `Passport: ${n} of 6 stamps`, 'aria-hidden': 'true' }), h('span.pp-short', { text: `Passport: ${n} of 6`, 'aria-hidden': 'true' }));
   clear(hud.passportStrip);
   clear(hud.passportList);
   for (const s of STATIONS) {
@@ -208,8 +264,10 @@ function refreshHud() {
 
 function togglePassport() {
   const open = hud.passportList.hidden;
+  if (open) { setDemoMenu(false); hud.hint.hidden = true; }
   hud.passportList.hidden = !open;
   hud.passportBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  hud.passport.classList.toggle('open', open);
   if (open) hud.passportList.querySelector('button')?.focus();
 }
 
@@ -248,8 +306,10 @@ function setPaused(v) {
     h('h2', { text: 'Paused' }),
     h('p', { text: 'Your progress is kept.' }),
     h('p', { text: driving
-      ? 'To drive, use the arrow keys or W A S D. Up goes, down backs up, left and right steer. Space brakes and H honks. On a touch screen, use the buttons.'
-      : 'To walk, click or tap the ground, or use the arrow keys or W A S D. To run, double-click or double-tap, hold Shift with the keys, or turn on the Run button. Stand in a ring and press Enter or Space, or tap Play.' }),
+      ? (touchOnly ? 'To drive, hold Go and steer with Left and Right. Back backs up, Brake stops and Horn honks. You can hold two buttons at once.'
+        : 'To drive, use the arrow keys or W A S D. Up goes, down backs up, left and right steer. Space brakes and H honks. On a touch screen, use the buttons.')
+      : (touchOnly ? 'To walk, tap the ground. To run, double-tap, or turn on the Run button. Stand in a ring and tap Play.'
+        : 'To walk, click or tap the ground, or use the arrow keys or W A S D. To run, double-click or double-tap, hold Shift with the keys, or turn on the Run button. Stand in a ring and press Enter or Space, or tap Play.') }),
     h('div.actions', null, resume,
       h('button', { type: 'button', onclick: () => { toggleSound(); setPaused(true); } }, h('span', { text: sound.on ? 'Turn sound off' : 'Turn sound on' })),
       mode === 'station' ? h('button', { type: 'button', onclick: () => { setPaused(false); exitStation(); } }, h('span', { text: 'Leave this station' })) : null,
@@ -270,6 +330,67 @@ function showStamp(skill) {
     h('div.actions', null, ok)));
   refreshHud();
   ok.focus();
+}
+
+// ---------- demo mode: presenter menu ----------
+/** A clearly labelled Demo chip that opens a menu to jump to any station or the drive. */
+function buildDemoMenu() {
+  hud.demoBtn = h('button.demo-chip', { type: 'button', 'aria-expanded': 'false', 'aria-controls': 'demo-menu', onclick: () => setDemoMenu(hud.demoMenu.hidden) },
+    h('span.demo-dot', { 'aria-hidden': 'true' }), h('span', { text: 'Demo' }));
+  hud.demoMenu = h('div#demo-menu.demo-menu', { hidden: true, role: 'group', 'aria-label': 'Demo: jump to' });
+  hud.demo = h('div.demo', null, hud.demoBtn, hud.demoMenu);
+}
+function fillDemoMenu() {
+  clear(hud.demoMenu);
+  const go = (label, fn, cls = '') => h(`button${cls}`, { type: 'button', onclick: fn }, h('span', { text: label }));
+  hud.demoMenu.append(
+    h('p.demo-head', { text: 'Demo mode. Nothing is saved. Jump to:' }),
+    ...STATIONS.map((s) => go(s.title, () => demoJump(s.id))),
+    go('Drive the bus', () => demoJump('drive')),
+    go('Exit demo', () => { location.replace(exitDemoUrl(location.href)); }, '.demo-exit'));
+}
+function setDemoMenu(open) {
+  if (!hud.demoMenu) return;
+  if (open) {
+    fillDemoMenu();
+    if (!hud.passportList.hidden) togglePassport();
+  }
+  hud.demoMenu.hidden = !open;
+  hud.demoBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) hud.demoMenu.querySelector('button')?.focus();
+}
+/** Leave whatever is open, then stand in a station's ring, or start the drive. */
+async function demoJump(id) {
+  setDemoMenu(false);
+  if (paused) setPaused(false);
+  if (entering || leavingDrive) return;
+  if (mode === 'station') exitStation();
+  else if (mode === 'drive') await exitDrive();
+  if (mode !== 'hub') return;
+  hud.toast.hidden = true;
+  teleport(id);
+  if (id === 'drive') await startDrive();
+  else hud.prompt.querySelector('button')?.focus();
+}
+
+/** Put the player in a ring, facing its station. */
+function teleport(id) {
+  if (mode !== 'hub') return;
+  const p = ringPos.get(id);
+  if (!p) return;
+  let yaw = Math.PI; // the drive spot faces the bus door
+  const sm = id === 'drive' ? null : hub.get(`station_${id}`);
+  if (sm) {
+    const q = new THREE.Quaternion(); sm.getWorldQuaternion(q);
+    const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(q);
+    yaw = Math.atan2(fwd.x, fwd.z);
+  }
+  keysDown.clear();
+  player.place(p.x, p.z, yaw);
+  avatar.play('idle');
+  follow.snap(player.position);
+  hud.hint.hidden = true;
+  updatePrompt(ringAtFast(p.x, p.z));
 }
 
 // ---------- ring labels ----------
@@ -340,6 +461,7 @@ function updatePrompt(id) {
   clear(hud.prompt);
   if (!id) { hud.prompt.hidden = true; return; }
   hud.prompt.hidden = false;
+  hud.hint.hidden = true;
   if (id === 'drive') {
     hud.prompt.append(
       h('span.prompt-title', { text: 'Drive the bus' }),
@@ -389,6 +511,8 @@ function readKeys() {
 window.addEventListener('keydown', (e) => {
   shiftHeld = e.shiftKey;
   if (mode === 'loading' || mode === 'select') return;
+  if (e.key === 'Escape' && hud.demoMenu && !hud.demoMenu.hidden) { setDemoMenu(false); hud.demoBtn.focus(); e.preventDefault(); return; }
+  if (e.key === 'Escape' && hud.passportList && !hud.passportList.hidden) { togglePassport(); hud.passportBtn.focus(); e.preventDefault(); return; }
   if (e.key === 'Escape' || (e.key.toLowerCase() === 'p' && (mode === 'hub' || mode === 'drive'))) {
     if (!hud.overlay.hidden && !paused) return; // stamp card open
     setPaused(!paused);
@@ -431,7 +555,10 @@ let down = null;
 /** last tap, for double-click / double-tap to run */
 const lastTap = { x: 0, y: 0, t: -1e9 };
 const DOUBLE_MS = 400, DOUBLE_PX = 40;
-canvas.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+canvas.addEventListener('pointerdown', (e) => {
+  down = { x: e.clientX, y: e.clientY, t: performance.now() };
+  if (hud.demoMenu && !hud.demoMenu.hidden) setDemoMenu(false);
+});
 canvas.addEventListener('pointerup', (e) => {
   if (!down || mode !== 'hub' || paused) return;
   const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
@@ -440,7 +567,8 @@ canvas.addEventListener('pointerup', (e) => {
   const now = performance.now();
   const dbl = now - lastTap.t < DOUBLE_MS && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < DOUBLE_PX;
   lastTap.x = e.clientX; lastTap.y = e.clientY; lastTap.t = dbl ? -1e9 : now;
-  ndc.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+  const cr = canvas.getBoundingClientRect();
+  ndc.set(((e.clientX - cr.left) / cr.width) * 2 - 1, -((e.clientY - cr.top) / cr.height) * 2 + 1);
   ray.setFromCamera(ndc, camera);
   if (!ray.ray.intersectPlane(ground, hit)) return;
   hud.hint.hidden = true;
@@ -472,9 +600,13 @@ async function enterStation(id) {
     avatar.root.rotation.y = player.yaw;
   }
   stationDef = def;
-  mode = 'station';
+  setMode('station');
   hud.toast.hidden = true;
   hud.prompt.hidden = true; hud.hint.hidden = true; hud.passport.hidden = true; hud.runBtn.hidden = true;
+  if (!hud.passportList.hidden) togglePassport();
+  setDemoMenu(false);
+  // Sound and Pause ride in the panel's top row while a station is open, so the panel never covers them.
+  hud.panelTop.append(hud.soundBtn, hud.pauseBtn);
   hud.panel.hidden = false;
   setRingLabelsVisible(false);
   clear(hud.panelBody);
@@ -507,7 +639,9 @@ function makeContext(def) {
     sound,
     reducedMotion: reduced,
     loadGLTF: (url) => loadGLTF(url),
-    viewport: () => ({ width: window.innerWidth, height: window.innerHeight, panelWidth: panelWidth() }),
+    viewport: () => { const { w, h: ht } = screenSize(); const c = panelCover(); return { width: w, height: ht, panelWidth: c.right, panelHeight: c.bottom, safe: safeArea() }; },
+    /** Portrait only: how tall the bottom sheet is ('short' leaves more room for the station's own view). */
+    setSheet: (size) => { hud.panel.classList.toggle('sheet-short', size === 'short'); hud.panel.classList.toggle('sheet-tall', size === 'tall'); resize(); },
     onResize: (fn) => resizeHandlers.add(fn),
     showStamp,
     exit: () => exitStation(),
@@ -527,8 +661,10 @@ function exitStation() {
   try { station?.dispose(); } catch (e) { console.error(e); }
   station = null;
   resizeHandlers.clear();
-  mode = 'hub';
+  hud.panel.classList.remove('sheet-short', 'sheet-tall');
+  setMode('hub');
   hud.panel.hidden = true;
+  hud.top.append(hud.soundBtn, hud.pauseBtn);
   setRingLabelsVisible(true);
   clear(hud.panelBody);
   hud.passport.hidden = false;
@@ -589,7 +725,7 @@ function showToast(text) {
 
 /** Tell the player once, after the badge is first built, that the bus is ready. */
 function maybeTellDriveReady() {
-  if (!isDriveUnlocked(save.data) || save.flag('driveReady')) return;
+  if (DEMO || !isDriveUnlocked(save.data) || save.flag('driveReady')) return;
   save.setFlag('driveReady');
   refreshDriveSpot();
   showToast('Your badge is done. The bus is ready to drive. Find the new ring by the bus door.');
@@ -602,9 +738,10 @@ async function startDrive() {
   keysDown.clear();
   player.stop();
   avatar.play('idle');
-  mode = 'drive';
+  setMode('drive');
   hud.prompt.hidden = true; hud.hint.hidden = true; hud.passport.hidden = true; hud.runBtn.hidden = true; hud.toast.hidden = true;
-  hud.passportList.hidden = true; hud.passportBtn.setAttribute('aria-expanded', 'false');
+  hud.passportList.hidden = true; hud.passportBtn.setAttribute('aria-expanded', 'false'); hud.passport.classList.remove('open');
+  setDemoMenu(false);
   const note = h('p.drive-loading', { role: 'status', text: 'Getting the bus ready...' });
   ui.append(note);
   let d = null;
@@ -642,7 +779,7 @@ async function startDrive() {
 
 /** Hub HUD and labels back, after a drive. */
 function backToHub() {
-  mode = 'hub';
+  setMode('hub');
   setRingLabelsVisible(true);
   hud.passport.hidden = false;
   hud.runBtn.hidden = false;
@@ -674,12 +811,27 @@ async function exitDrive() {
 }
 
 // ---------- loop ----------
+/**
+ * Aim for 30 frames a second. If frames run slow for three seconds in a row
+ * while playing, lower the pixel ratio a step (never under 1).
+ */
+let slowSeconds = 0;
+function checkSpeed() {
+  if (mode === 'loading' || mode === 'select' || paused || document.hidden) { slowSeconds = 0; return; }
+  slowSeconds = fps < 27 ? slowSeconds + 1 : 0;
+  if (slowSeconds < 3) return;
+  slowSeconds = 0;
+  const { w, h: ht } = screenSize();
+  const now = renderer.getPixelRatio();
+  if (pixelRatioFor(window.devicePixelRatio, w * ht, slowSteps + 1, touchOnly) < now) { slowSteps++; resize(); }
+}
+
 const timer = new THREE.Timer();
 let frames = 0, fpsT = 0, fps = 0;
 function tick() {
   timer.update();
   const dt = Math.min(0.1, timer.getDelta());
-  frames++; fpsT += dt; if (fpsT >= 1) { fps = frames / fpsT; frames = 0; fpsT = 0; }
+  frames++; fpsT += dt; if (fpsT >= 1) { fps = frames / fpsT; frames = 0; fpsT = 0; checkSpeed(); }
   if (!paused) {
     if (mode === 'hub') {
       player.update(dt, readKeys());
@@ -711,7 +863,7 @@ async function boot() {
   cacheRings();
   progress(1);
   renderer.compile(scene, camera);
-  mode = 'select';
+  setMode('select');
   renderer.setAnimationLoop(tick);
   const entry = await selectScreen(roster);
   save.setCharacter(entry.id);
@@ -731,7 +883,7 @@ async function boot() {
   follow = new FollowCamera(camera);
   follow.snap(player.position);
   buildHud();
-  mode = 'hub';
+  setMode('hub');
   resize();
   announce('You are outside the bus. Walk to a glowing ring to play a station.');
   maybeTellDriveReady();
@@ -744,7 +896,8 @@ async function boot() {
       ring: (id) => { const p = ringPos.get(id); return { x: p.x, z: p.z }; },
       player: () => ({ x: player.position.x, z: player.position.z }),
       walkTo: (x, z) => player.walkTo(x, z),
-      walkToStation, info: () => renderer.info.render, mem: () => ({ ...renderer.info.memory }),
+      walkToStation, teleport, demo: DEMO, info: () => renderer.info.render, mem: () => ({ ...renderer.info.memory }),
+      get pixelRatio() { return renderer.getPixelRatio(); },
       get drive() { return drive?.debug || null; },
       startDrive, exitDrive,
       get driveSpot() { return !!driveSpot; },

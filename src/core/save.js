@@ -93,11 +93,13 @@ export function sanitize(raw) {
 }
 
 /**
- * @param {{storage?: any, key?: string}} [opts]
+ * @param {{storage?: any, key?: string, memoryOnly?: boolean}} [opts]
+ *   memoryOnly: the given storage is a memory store (demo mode); report it as not persistent.
  */
 export function createSave(opts = {}) {
   const key = opts.key || SAVE_KEY;
   let { storage, persistent } = pickStorage(opts.storage);
+  if (opts.memoryOnly) persistent = false;
   /** @type {SaveData} */
   let data = defaults();
   try {

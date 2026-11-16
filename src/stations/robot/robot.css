@@ -25,3 +25,8 @@
   .rr-scroll { margin: 0 -10px; padding: 0 10px 6px; }
   .rr-foot .message { font-size: 16px; max-height: 30vh; }
 }
+/* upright phones: the panel is a bottom sheet with 14 px side padding */
+@media (max-aspect-ratio: 9/10) {
+  .rr-scroll { margin: 0 -14px; padding: 0 14px 8px; }
+  .rr-map svg { max-height: 150px; }
+}

@@ -36,3 +36,7 @@
 .cy-stage.cy-short .cy-key { display: none; }
 .cy-stage.cy-short .cy-next { display: none; }
 @media (prefers-reduced-motion: reduce) { .cy-tap.cy-pressed { animation: none; } }
+/* upright phones: the bar sits just above the bottom sheet; a big Tap target and word buttons */
+.cy-stage.cy-narrow .cy-tap { min-height: 64px; font-size: 22px; }
+.cy-stage.cy-narrow .cy-choice { min-height: 52px; padding: 2px 6px; justify-content: center; text-align: center; }
+.cy-stage.cy-narrow .cy-choices { gap: 6px; }
