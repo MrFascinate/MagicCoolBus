@@ -1,0 +1,38 @@
+/* Science Cypher: lyric bar and beat track at the bottom of the 3D view. Ships in the station chunk. */
+.cy-stage { position: absolute; left: 0; bottom: 0; right: 0; display: flex; justify-content: center; padding: 0 12px 12px; pointer-events: none; }
+.cy-stage > * { pointer-events: auto; }
+.cy-bar { background: rgba(255,255,255,0.97); border: 4px solid var(--navy); border-radius: 16px; padding: 10px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 8px; }
+.cy-track { display: block; border-radius: 12px; }
+.cy-status { display: none; }
+.cy-line { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.3; }
+.cy-again { color: #8a3a00; font-weight: 800; }
+.cy-blank { display: inline-flex; min-width: 5.5em; justify-content: center; border-bottom: 4px dashed var(--navy); padding: 0 6px; margin-left: 2px; background: #fff7d6; border-radius: 6px 6px 0 0; }
+.cy-blank.cy-ok { border-bottom-style: solid; border-color: #0d7a6f; background: #e6f7f4; }
+.cy-blank.cy-bad { border-bottom-style: solid; border-color: var(--red); background: #ffe8ee; }
+.cy-blank s { color: #6b2134; margin-right: 6px; text-decoration-thickness: 3px; }
+.cy-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cy-choice { font-size: 20px; font-weight: 800; min-height: 56px; justify-content: flex-start; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.cy-choice[disabled] { opacity: 0.7; }
+.cy-key { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 2px solid var(--navy); border-radius: 6px; font-size: 16px; flex: none; }
+.cy-mark { display: inline-flex; width: 26px; height: 26px; margin-left: auto; }
+.cy-choice.cy-right { opacity: 1; border-width: 4px; border-color: #0d7a6f; background: #e6f7f4; }
+.cy-choice.cy-wrong { opacity: 1; border-style: dashed; border-color: var(--red); background: #ffe8ee; text-decoration: line-through; }
+.cy-choice.cy-offbeat { opacity: 1; border-style: dotted; border-width: 4px; border-color: #8a5d00; background: #fff3e0; }
+.cy-next { margin: 0; font-size: 16px; color: #3b4766; }
+.cy-tap { font-size: 22px; min-height: 64px; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.cy-tap.cy-pressed { animation: cy-press 0.15s ease-out; }
+@keyframes cy-press { from { transform: scale(0.96); } to { transform: scale(1); } }
+.cy-progress { font-weight: 700; }
+.cy-note { display: flex; gap: 8px; align-items: center; font-size: 16px; font-weight: 700; }
+.cy-steps { padding-left: 1.3em; }
+.cy-verse summary { cursor: pointer; font-weight: 700; display: list-item; padding: 10px 0; }
+.cy-verse ol { padding-left: 1.4em; font-size: 16px; }
+/* phones in landscape */
+.cy-stage.cy-short { padding: 0 6px 6px; }
+.cy-stage.cy-short .cy-bar { padding: 5px 8px; gap: 4px; border-width: 3px; }
+.cy-stage.cy-short .cy-line { font-size: 16px; line-height: 1.25; }
+.cy-stage.cy-short .cy-choice { font-size: 16px; min-height: 44px; padding: 2px 8px; }
+.cy-stage.cy-short .cy-tap { min-height: 48px; font-size: 18px; }
+.cy-stage.cy-short .cy-key { display: none; }
+.cy-stage.cy-short .cy-next { display: none; }
+@media (prefers-reduced-motion: reduce) { .cy-tap.cy-pressed { animation: none; } }

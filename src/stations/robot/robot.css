@@ -1,0 +1,27 @@
+/* Robot Relay: loaded with the station's lazy chunk. */
+.rr .block-left, .rr .block-right { background: #fff3e0; border-color: #b45a00; }
+.rr .block-reach { background: #e8efff; border-color: #2546a8; }
+.rr .block-grip { background: #e6f7f4; border-color: #0d7a6f; }
+.rr .block-release { background: #f6e9ff; border-color: #6a2ea8; }
+.rr .bq-palette { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.rr .bq-row { margin: 4px 0; scroll-margin-bottom: 8px; scroll-margin-top: 10px; }
+.rr .bq-main { min-height: 44px; }
+.rr-map { margin: 6px 0 4px; padding: 4px; border: 3px solid #d5dcef; border-radius: 12px; background: #fbfcff; }
+.rr-map svg { display: block; width: 100%; height: auto; max-height: 250px; }
+.rr-map .rr-bin.flash rect:first-child { stroke: #c81e4a; stroke-width: 6; stroke-dasharray: 6 4; }
+.rr-map .rr-barrier.flash rect { stroke: #c81e4a; stroke-width: 5; }
+.panel-body.rr-play { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0; }
+.rr-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 0 -16px; padding: 0 16px 8px; }
+.rr-foot { flex: none; background: #fff; padding: 8px 0 10px; border-top: 2px solid #d5dcef; }
+.rr-foot .actions { margin: 8px 0 0; }
+.rr-foot .message { max-height: 40vh; overflow-y: auto; }
+.rr .bq-row.is-error { border-color: var(--red); }
+@media (max-height: 820px) {
+  .rr-map svg { max-height: 190px; }
+}
+@media (max-height: 520px) {
+  .rr-map svg { max-height: 130px; }
+  .rr .bq-palette { grid-template-columns: repeat(2, 1fr); }
+  .rr-scroll { margin: 0 -10px; padding: 0 10px 6px; }
+  .rr-foot .message { font-size: 16px; max-height: 30vh; }
+}

@@ -1,0 +1,22 @@
+/* Hologram Heroes panel styles (ships in the station's own chunk). */
+.hh-round { font-size: 16px; font-weight: 700; color: #2d3958; margin-bottom: 4px; }
+.hh-problem { border: 3px solid var(--navy); border-radius: 12px; padding: 8px 12px; background: #eef6ff; margin-bottom: 10px; }
+.hh-problem h3 { margin-top: 0; font-size: 16px; text-transform: uppercase; letter-spacing: 0.04em; }
+.hh-problem p { font-size: 19px; font-weight: 600; margin: 0; }
+.hh-choices { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 8px; }
+.hh-choice { width: 100%; justify-content: flex-start; text-align: left; gap: 10px; align-items: flex-start; min-height: 48px; border-width: 3px; }
+.hh-num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; }
+.hh-choice-text { display: flex; flex-direction: column; gap: 2px; }
+.hh-choice.is-out { border-style: dashed; border-color: var(--red); background: #fff3f6; opacity: 1; }
+.hh-choice.is-out strong { text-decoration: line-through; }
+.hh-choice.is-out .hh-num { background: #6b7799; }
+.hh-out { display: flex; gap: 6px; align-items: flex-start; font-size: 16px; color: #5a1022; }
+.hh-person { border: 3px solid var(--navy); border-radius: 12px; padding: 8px 12px; margin: 8px 0; background: #f4f8ff; }
+.hh-role { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; color: #2d3958; }
+.hh-name { font-size: 22px; margin: 2px 0; }
+.hh-meta { margin: 0; font-size: 17px; }
+.hh-why { font-size: 17px; }
+.hh-list { margin: 0 0 6px; padding-left: 22px; }
+.hh-list li { margin-bottom: 4px; }
+.hh-yourstep { border: 3px dashed var(--teal); border-radius: 12px; padding: 6px 12px; margin-top: 8px; }
+.hh-yourstep h3 { margin-top: 2px; }

@@ -1,0 +1,41 @@
+/* Badge Builder panel styles (ships in the station's own chunk). */
+.bb-sub { font-size: 16px; font-weight: 700; color: #2d3958; margin: 0 0 4px; }
+.bb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; margin-bottom: 8px; }
+.bb-tile { flex-direction: column; gap: 4px; min-height: 56px; padding: 8px; border-width: 3px; text-align: center; }
+.bb-tile[aria-checked="true"], .bb-tile[aria-pressed="true"] { border-width: 5px; border-color: var(--navy); background: #fff7d6; }
+.bb-tile[aria-checked="true"]::after, .bb-tile[aria-pressed="true"]::after { content: "\2713  Picked"; font-size: 16px; font-weight: 800; }
+.bb-tile-icon { display: inline-flex; width: 40px; height: 34px; align-items: center; justify-content: center; color: var(--navy); }
+.bb-tile-icon svg { width: 100%; height: 100%; }
+.bb-tile-note { font-size: 16px; font-weight: 400; color: #2d3958; }
+.bb-orient { grid-template-columns: 1fr; }
+.bb-orient .bb-tile { flex-direction: row; justify-content: flex-start; text-align: left; flex-wrap: wrap; column-gap: 10px; }
+.bb-orient .bb-tile .bb-tile-note { flex-basis: 100%; }
+.bb-colors .bb-tile { flex-direction: row; justify-content: flex-start; flex-wrap: wrap; }
+.bb-swatch { width: 26px; height: 26px; border-radius: 6px; border: 2px solid var(--ink); flex: none; }
+.bb-preview { display: flex; justify-content: center; margin: 4px 0 8px; }
+.bb-preview svg { max-width: 100%; height: auto; background: #dfe7f7; border-radius: 12px; }
+.bb-spots { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; margin-bottom: 6px; }
+.bb-spot { justify-content: flex-start; gap: 6px; min-height: 48px; padding: 4px 8px; }
+.bb-spot[aria-pressed="true"] { border-width: 5px; border-color: var(--navy); background: #fff7d6; }
+.bb-spot-num { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; flex: none; }
+.bb-spot-icon { width: 26px; height: 26px; display: inline-flex; color: var(--navy); }
+.bb-spot-icon svg { width: 100%; height: 100%; }
+.bb-ghost { position: fixed; z-index: 50; width: 54px; height: 54px; margin: -27px 0 0 -27px; pointer-events: none; background: #fff7d6; border: 3px solid var(--navy); border-radius: 50%; color: var(--navy); display: flex; align-items: center; justify-content: center; }
+.bb-ghost svg { width: 36px; height: 36px; }
+.bb-letters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.bb-letter-label { display: flex; flex-direction: column; font-size: 16px; font-weight: 700; gap: 4px; }
+.bb-letter { font-size: 20px; min-height: 44px; min-width: 88px; border: 3px solid var(--navy); border-radius: 10px; background: #fff; padding: 4px 8px; }
+.bb-letter:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+.bb-layer { font-size: 18px; font-weight: 800; min-height: 1.2em; margin: 0; }
+.bb-go { font-size: 19px; }
+.bb-final { display: flex; flex-direction: column; align-items: center; border: 4px solid var(--navy); border-radius: 16px; padding: 10px; background: #f4f8ff; }
+.bb-final-art svg { width: min(260px, 70vw); height: auto; }
+.bb-final-desc { font-size: 16px; text-align: center; margin: 4px 0 0; }
+.bb-done { display: flex; gap: 8px; align-items: center; font-weight: 800; font-size: 18px; margin-top: 10px; }
+.bb-code { font: 800 24px/1.2 ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; letter-spacing: 0.08em; border: 3px solid var(--navy); border-radius: 10px; padding: 6px 10px; width: 100%; max-width: 260px; background: #fff; }
+.bb-code:focus-visible { outline: 4px solid var(--focus); outline-offset: 2px; }
+.bb-overlay { position: absolute; inset: 0; z-index: 40; background: rgba(15,27,61,0.8); display: flex; align-items: center; justify-content: center; padding: 12px; }
+.bb-overlay-card { background: #fff; border-radius: 18px; padding: 14px 20px; text-align: center; max-height: 100%; overflow: auto; }
+.bb-overlay-art svg { width: min(420px, 80vw, 62vh); height: auto; }
+.bb-overlay-code { font: 800 30px/1.2 ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; letter-spacing: 0.08em; margin: 6px 0; }
+.bb-overlay-card .actions { justify-content: center; }

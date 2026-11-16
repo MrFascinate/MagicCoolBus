@@ -1,0 +1,55 @@
+/* Sky Seeker: loaded with the station's lazy chunk. */
+.sky-stage { position: absolute; left: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 12px; pointer-events: none; background: radial-gradient(ellipse at center, #16224a, #05081a); }
+.sky-stage > * { pointer-events: auto; }
+.sky-stage.in { animation: sky-in 0.45s ease-out; }
+@keyframes sky-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+.sky-scope { position: relative; border-radius: 50%; background: #05070d; box-shadow: 0 0 0 6px #1b2440, 0 10px 30px rgba(0,0,0,0.45); flex: none; }
+.sky-canvas { display: block; border-radius: 50%; touch-action: none; cursor: grab; }
+.sky-canvas:active { cursor: grabbing; }
+.sky-canvas:focus-visible { outline: 5px solid var(--focus); outline-offset: 4px; }
+.sky-arrow { position: absolute; width: 48px; height: 48px; min-width: 48px; padding: 0; border-radius: 50%; background: rgba(255,255,255,0.92); font-size: 20px; touch-action: none; user-select: none; }
+.sky-up { top: 6px; left: 50%; transform: translateX(-50%); }
+.sky-down { bottom: 6px; left: 50%; transform: translateX(-50%); }
+.sky-left { left: 6px; top: 50%; transform: translateY(-50%); }
+.sky-right { right: 6px; top: 50%; transform: translateY(-50%); }
+.sky-side { display: flex; flex-direction: column; gap: 8px; flex: none; }
+.sky-zooms { display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.92); border: 3px solid var(--navy); border-radius: 12px; padding: 6px; }
+.sky-zoom { flex-direction: column; gap: 0; padding: 4px 6px; line-height: 1.15; }
+.sky-zoom-name { font-weight: 800; }
+.sky-zoom-fov { font-size: 16px; color: #3b4766; }
+.sky-zoom[aria-pressed="true"], .sky-zoom[aria-pressed="true"]:hover:not([disabled]) { background: var(--navy); color: #fff; border-width: 4px; }
+.sky-zoom[aria-pressed="true"] .sky-zoom-fov { color: #dfe7ff; }
+.sky-zoom[aria-pressed="true"]::before { content: "\2713 "; }
+.sky-zoom.pulse { outline: 5px dashed var(--yellow); outline-offset: 2px; animation: sky-pulse 1s ease-in-out infinite; }
+@keyframes sky-pulse { 50% { transform: scale(1.06); } }
+.sky-lost { margin: 0; background: #fff7d6; border: 3px dashed #8a5d00; border-radius: 10px; padding: 6px 8px; font-size: 16px; font-weight: 700; }
+.sky-confirm { font-size: 18px; }
+.sky-toggle { font-size: 16px; background: rgba(255,255,255,0.92); }
+.sky-toggle[aria-pressed="false"] { border-style: dashed; }
+.sky .sky-looks { font-weight: 700; font-size: 17px; }
+.sky .sky-looks.over { text-decoration: underline wavy; }
+.sky-clue-head { font-size: 16px; text-transform: uppercase; letter-spacing: 0.04em; color: #3b4766; }
+.sky-steps { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 8px; }
+.sky-steps li { border: 3px solid #c5cde3; border-radius: 12px; padding: 6px 10px; }
+.sky-steps li.now { border-color: var(--navy); background: #fff7d6; }
+.sky-steps li.done { border-style: dashed; color: #2d3958; }
+.sky-step-tag { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; font-size: 16px; margin-right: 6px; }
+.sky-step-text { font-size: 16px; }
+.sky-chart-wrap, .sky-closeup-wrap { margin: 6px 0 10px; }
+.sky-chart, .sky-closeup { display: block; width: 100%; max-width: 300px; height: auto; border-radius: 12px; }
+.sky-closeup { max-width: 360px; }
+.sky-chart-wrap figcaption, .sky-closeup-wrap figcaption { font-size: 16px; color: #3b4766; }
+.message.note { border: 3px solid var(--navy); border-radius: 12px; padding: 8px 10px; background: #eef3ff; }
+@media (max-height: 520px) {
+  .sky-stage { gap: 6px; padding: 6px; }
+  .sky-arrow { width: 44px; height: 44px; min-width: 44px; font-size: 18px; }
+  .sky-zoom { padding: 2px 4px; min-height: 40px; }
+  .sky-zoom-fov { display: none; }
+  .sky-zooms { padding: 4px; gap: 4px; }
+  .sky-side { gap: 5px; }
+  .sky-toggle, .sky-confirm { min-height: 40px; padding: 4px 8px; }
+  .sky-chart { max-width: 200px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-zoom.pulse { animation: none; }
+}

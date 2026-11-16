@@ -1,0 +1,394 @@
+{
+ "note": "Simulated SEM-style renders from scripts/render-specimens.py (Blender, Cycles). Not real micrographs. To use real images: replace the file, set simulated to false and set widthUm to the real width shown.",
+ "maxKB": 40.0,
+ "images": [
+  {
+   "specimen": "salt",
+   "step": 1,
+   "file": "salt_1.webp",
+   "widthUm": 40,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.encyclopedia.pub/image/1409",
+    "https://scaleofuniverse.com/universe/grain-of-salt"
+   ]
+  },
+  {
+   "specimen": "salt",
+   "step": 2,
+   "file": "salt_2.webp",
+   "widthUm": 150,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.encyclopedia.pub/image/1409",
+    "https://scaleofuniverse.com/universe/grain-of-salt"
+   ]
+  },
+  {
+   "specimen": "salt",
+   "step": 3,
+   "file": "salt_3.webp",
+   "widthUm": 600,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.encyclopedia.pub/image/1409",
+    "https://scaleofuniverse.com/universe/grain-of-salt"
+   ]
+  },
+  {
+   "specimen": "salt",
+   "step": 4,
+   "file": "salt_4.webp",
+   "widthUm": 2400,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.encyclopedia.pub/image/1409",
+    "https://scaleofuniverse.com/universe/grain-of-salt"
+   ]
+  },
+  {
+   "specimen": "hair",
+   "step": 1,
+   "file": "hair_1.webp",
+   "widthUm": 30,
+   "simulated": true,
+   "descriptionSources": [
+    "https://wellcomecollection.org/works/wxgqyf66",
+    "https://bionumbers.hms.harvard.edu/bionumber.aspx?id=114259"
+   ]
+  },
+  {
+   "specimen": "hair",
+   "step": 2,
+   "file": "hair_2.webp",
+   "widthUm": 120,
+   "simulated": true,
+   "descriptionSources": [
+    "https://wellcomecollection.org/works/wxgqyf66",
+    "https://bionumbers.hms.harvard.edu/bionumber.aspx?id=114259"
+   ]
+  },
+  {
+   "specimen": "hair",
+   "step": 3,
+   "file": "hair_3.webp",
+   "widthUm": 500,
+   "simulated": true,
+   "descriptionSources": [
+    "https://wellcomecollection.org/works/wxgqyf66",
+    "https://bionumbers.hms.harvard.edu/bionumber.aspx?id=114259"
+   ]
+  },
+  {
+   "specimen": "hair",
+   "step": 4,
+   "file": "hair_4.webp",
+   "widthUm": 2500,
+   "simulated": true,
+   "descriptionSources": [
+    "https://wellcomecollection.org/works/wxgqyf66",
+    "https://bionumbers.hms.harvard.edu/bionumber.aspx?id=114259"
+   ]
+  },
+  {
+   "specimen": "hooks",
+   "step": 1,
+   "file": "hooks_1.webp",
+   "widthUm": 400,
+   "simulated": true,
+   "descriptionSources": [
+    "https://hackaday.com/2018/04/19/mechanisms-hook-and-loop-fasteners",
+    "https://www.invent.org/blog/inventors/walk-in-the-woods-velcro"
+   ]
+  },
+  {
+   "specimen": "hooks",
+   "step": 2,
+   "file": "hooks_2.webp",
+   "widthUm": 1200,
+   "simulated": true,
+   "descriptionSources": [
+    "https://hackaday.com/2018/04/19/mechanisms-hook-and-loop-fasteners",
+    "https://www.invent.org/blog/inventors/walk-in-the-woods-velcro"
+   ]
+  },
+  {
+   "specimen": "hooks",
+   "step": 3,
+   "file": "hooks_3.webp",
+   "widthUm": 3600,
+   "simulated": true,
+   "descriptionSources": [
+    "https://hackaday.com/2018/04/19/mechanisms-hook-and-loop-fasteners",
+    "https://www.invent.org/blog/inventors/walk-in-the-woods-velcro"
+   ]
+  },
+  {
+   "specimen": "hooks",
+   "step": 4,
+   "file": "hooks_4.webp",
+   "widthUm": 12000,
+   "simulated": true,
+   "descriptionSources": [
+    "https://hackaday.com/2018/04/19/mechanisms-hook-and-loop-fasteners",
+    "https://www.invent.org/blog/inventors/walk-in-the-woods-velcro"
+   ]
+  },
+  {
+   "specimen": "pollen",
+   "step": 1,
+   "file": "pollen_1.webp",
+   "widthUm": 8,
+   "simulated": true,
+   "descriptionSources": [
+    "https://indianbotsoc.org/assets/upload/uploaded/80-83%20Brinda%20Shukla%20and%20S.%20N.%20Gupta.pdf",
+    "https://microcosmos.foldscope.com/post/tGVj42l3nNHJosn3EtBP"
+   ]
+  },
+  {
+   "specimen": "pollen",
+   "step": 2,
+   "file": "pollen_2.webp",
+   "widthUm": 22,
+   "simulated": true,
+   "descriptionSources": [
+    "https://indianbotsoc.org/assets/upload/uploaded/80-83%20Brinda%20Shukla%20and%20S.%20N.%20Gupta.pdf",
+    "https://microcosmos.foldscope.com/post/tGVj42l3nNHJosn3EtBP"
+   ]
+  },
+  {
+   "specimen": "pollen",
+   "step": 3,
+   "file": "pollen_3.webp",
+   "widthUm": 55,
+   "simulated": true,
+   "descriptionSources": [
+    "https://indianbotsoc.org/assets/upload/uploaded/80-83%20Brinda%20Shukla%20and%20S.%20N.%20Gupta.pdf",
+    "https://microcosmos.foldscope.com/post/tGVj42l3nNHJosn3EtBP"
+   ]
+  },
+  {
+   "specimen": "pollen",
+   "step": 4,
+   "file": "pollen_4.webp",
+   "widthUm": 220,
+   "simulated": true,
+   "descriptionSources": [
+    "https://indianbotsoc.org/assets/upload/uploaded/80-83%20Brinda%20Shukla%20and%20S.%20N.%20Gupta.pdf",
+    "https://microcosmos.foldscope.com/post/tGVj42l3nNHJosn3EtBP"
+   ]
+  },
+  {
+   "specimen": "wing",
+   "step": 1,
+   "file": "wing_1.webp",
+   "widthUm": 10,
+   "simulated": true,
+   "descriptionSources": [
+    "https://pubs.rsc.org/en/content/articlehtml/2020/fd/d0fd00038h",
+    "https://phys.org/news/2024-06-moments-butterfly-scale-formation.pdf"
+   ]
+  },
+  {
+   "specimen": "wing",
+   "step": 2,
+   "file": "wing_2.webp",
+   "widthUm": 50,
+   "simulated": true,
+   "descriptionSources": [
+    "https://pubs.rsc.org/en/content/articlehtml/2020/fd/d0fd00038h",
+    "https://phys.org/news/2024-06-moments-butterfly-scale-formation.pdf"
+   ]
+  },
+  {
+   "specimen": "wing",
+   "step": 3,
+   "file": "wing_3.webp",
+   "widthUm": 250,
+   "simulated": true,
+   "descriptionSources": [
+    "https://pubs.rsc.org/en/content/articlehtml/2020/fd/d0fd00038h",
+    "https://phys.org/news/2024-06-moments-butterfly-scale-formation.pdf"
+   ]
+  },
+  {
+   "specimen": "wing",
+   "step": 4,
+   "file": "wing_4.webp",
+   "widthUm": 1000,
+   "simulated": true,
+   "descriptionSources": [
+    "https://pubs.rsc.org/en/content/articlehtml/2020/fd/d0fd00038h",
+    "https://phys.org/news/2024-06-moments-butterfly-scale-formation.pdf"
+   ]
+  },
+  {
+   "specimen": "leaf",
+   "step": 1,
+   "file": "leaf_1.webp",
+   "widthUm": 25,
+   "simulated": true,
+   "descriptionSources": [
+    "https://mmegias.webs2.uvigo.es/02-english/1-vegetal/v-imagenes-grandes/proteccion_estomas.php",
+    "https://faculty.csbsju.edu/SSAUPE/biol327/Lab/stomata/stoma_lab_size.htm"
+   ]
+  },
+  {
+   "specimen": "leaf",
+   "step": 2,
+   "file": "leaf_2.webp",
+   "widthUm": 100,
+   "simulated": true,
+   "descriptionSources": [
+    "https://mmegias.webs2.uvigo.es/02-english/1-vegetal/v-imagenes-grandes/proteccion_estomas.php",
+    "https://faculty.csbsju.edu/SSAUPE/biol327/Lab/stomata/stoma_lab_size.htm"
+   ]
+  },
+  {
+   "specimen": "leaf",
+   "step": 3,
+   "file": "leaf_3.webp",
+   "widthUm": 400,
+   "simulated": true,
+   "descriptionSources": [
+    "https://mmegias.webs2.uvigo.es/02-english/1-vegetal/v-imagenes-grandes/proteccion_estomas.php",
+    "https://faculty.csbsju.edu/SSAUPE/biol327/Lab/stomata/stoma_lab_size.htm"
+   ]
+  },
+  {
+   "specimen": "leaf",
+   "step": 4,
+   "file": "leaf_4.webp",
+   "widthUm": 3000,
+   "simulated": true,
+   "descriptionSources": [
+    "https://mmegias.webs2.uvigo.es/02-english/1-vegetal/v-imagenes-grandes/proteccion_estomas.php",
+    "https://faculty.csbsju.edu/SSAUPE/biol327/Lab/stomata/stoma_lab_size.htm"
+   ]
+  },
+  {
+   "specimen": "paper",
+   "step": 1,
+   "file": "paper_1.webp",
+   "widthUm": 40,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.britannica.com/technology/paper",
+    "https://www.britannica.com/science/wood-plant-tissue/Microstructure"
+   ]
+  },
+  {
+   "specimen": "paper",
+   "step": 2,
+   "file": "paper_2.webp",
+   "widthUm": 200,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.britannica.com/technology/paper",
+    "https://www.britannica.com/science/wood-plant-tissue/Microstructure"
+   ]
+  },
+  {
+   "specimen": "paper",
+   "step": 3,
+   "file": "paper_3.webp",
+   "widthUm": 1000,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.britannica.com/technology/paper",
+    "https://www.britannica.com/science/wood-plant-tissue/Microstructure"
+   ]
+  },
+  {
+   "specimen": "paper",
+   "step": 4,
+   "file": "paper_4.webp",
+   "widthUm": 5000,
+   "simulated": true,
+   "descriptionSources": [
+    "https://www.britannica.com/technology/paper",
+    "https://www.britannica.com/science/wood-plant-tissue/Microstructure"
+   ]
+  },
+  {
+   "specimen": "cotton",
+   "step": 1,
+   "file": "cotton_1.webp",
+   "widthUm": 30,
+   "simulated": true,
+   "descriptionSources": [
+    "https://cameo.mfa.org/wiki/Cotton"
+   ]
+  },
+  {
+   "specimen": "cotton",
+   "step": 2,
+   "file": "cotton_2.webp",
+   "widthUm": 150,
+   "simulated": true,
+   "descriptionSources": [
+    "https://cameo.mfa.org/wiki/Cotton"
+   ]
+  },
+  {
+   "specimen": "cotton",
+   "step": 3,
+   "file": "cotton_3.webp",
+   "widthUm": 800,
+   "simulated": true,
+   "descriptionSources": [
+    "https://cameo.mfa.org/wiki/Cotton"
+   ]
+  },
+  {
+   "specimen": "cotton",
+   "step": 4,
+   "file": "cotton_4.webp",
+   "widthUm": 4000,
+   "simulated": true,
+   "descriptionSources": [
+    "https://cameo.mfa.org/wiki/Cotton"
+   ]
+  },
+  {
+   "specimen": "graphite",
+   "step": 1,
+   "file": "graphite_1.webp",
+   "widthUm": 10,
+   "simulated": true,
+   "descriptionSources": [
+    "https://micro.org.au/inner-space/pencil-lead/"
+   ]
+  },
+  {
+   "specimen": "graphite",
+   "step": 2,
+   "file": "graphite_2.webp",
+   "widthUm": 50,
+   "simulated": true,
+   "descriptionSources": [
+    "https://micro.org.au/inner-space/pencil-lead/"
+   ]
+  },
+  {
+   "specimen": "graphite",
+   "step": 3,
+   "file": "graphite_3.webp",
+   "widthUm": 400,
+   "simulated": true,
+   "descriptionSources": [
+    "https://micro.org.au/inner-space/pencil-lead/"
+   ]
+  },
+  {
+   "specimen": "graphite",
+   "step": 4,
+   "file": "graphite_4.webp",
+   "widthUm": 18000,
+   "simulated": true,
+   "descriptionSources": [
+    "https://micro.org.au/inner-space/pencil-lead/"
+   ]
+  }
+ ]
+}

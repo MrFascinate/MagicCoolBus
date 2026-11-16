@@ -1,0 +1,57 @@
+{
+  "placeholder": true,
+  "note": "PLACEHOLDER LYRICS for testing the game. Justin to rewrite, perform and record. Every line was checked against the sources in SOURCES.md (ids in src). Keep each blank as the last word of the line so it lands on the star beat. Lines marked src 'game' describe the game itself.",
+  "levels": [
+    {
+      "id": 1,
+      "title": "Tiny things",
+      "topic": "Scale and microscopes (Microscopic Madness)",
+      "bpm": 86,
+      "replayLimit": 3,
+      "lines": [
+        { "before": "Light can only show so small, so this scope shoots beams of", "answer": "electrons", "choices": ["electrons", "sound waves", "bubbles"], "meaning": "An electron microscope aims a beam of electrons at a sample. Electrons have a shorter wavelength than light, so they show smaller things.", "src": ["nobel-ruska"] },
+        { "before": "Ruska and Max Knoll built the first one in nineteen thirty", "answer": "one", "choices": ["nine", "one", "three"], "meaning": "Ernst Ruska worked with Max Knoll to build the first electron microscope in 1931. Ruska shared the Nobel Prize in Physics in 1986.", "src": ["nobel-ruska", "nobel-ruska-bio"] },
+        { "before": "A hair from your head is a tenth of a millimeter", "answer": "wide", "choices": ["long", "old", "wide"], "meaning": "A head hair is about 0.1 mm, or 100 micrometers, wide.", "src": ["hair-width"] },
+        { "before": "Zoom in on that hair and the outside is covered in", "answer": "scales", "choices": ["scales", "spots", "wheels"], "meaning": "A hair's outer layer is made of tightly packed scales that overlap.", "src": ["hair-sem"] },
+        { "before": "Salt atoms stack up in a pattern, so each grain is a tiny", "answer": "cube", "choices": ["ring", "cube", "star"], "meaning": "Sodium and chloride ions line up in a repeating cube pattern, so table salt grains are tiny cubes.", "src": ["salt-scale"] },
+        { "before": "Sunflower pollen has spikes that help it stick to", "answer": "bees", "choices": ["rocks", "rain", "bees"], "meaning": "The spiky outer wall of sunflower pollen helps it attach to pollinators such as bees.", "src": ["pollen-foldscope"] },
+        { "before": "A butterfly wing has scales that overlap like roof", "answer": "shingles", "choices": ["shingles", "windows", "chimneys"], "meaning": "Hundreds of thousands of tiny scales cover a butterfly wing in overlapping rows, like shingles on a roof.", "src": ["wing-phys"] },
+        { "before": "Leaves trade gases through tiny pores called", "answer": "stomata", "choices": ["freckles", "stomata", "pixels"], "meaning": "Stomata are tiny pores in a leaf. Guard cells open and close them to control gas and water exchange.", "src": ["leaf-atlas"] }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Machines and code",
+      "topic": "Sequences and loops (Robot Relay, Drone Dash)",
+      "bpm": 90,
+      "replayLimit": 3,
+      "lines": [
+        { "before": "A program is a list of steps, and the steps go in", "answer": "order", "choices": ["order", "circles", "colors"], "meaning": "A sequence is the exact order a computer follows, one step after another. Change the order and you change what happens.", "src": ["seq-flip"] },
+        { "before": "Need the same steps again? One block repeats them. That's a", "answer": "loop", "choices": ["map", "loop", "nap"], "meaning": "A loop uses one command to repeat the same steps many times.", "src": ["loop-codingal"] },
+        { "before": "Turn left or right from the way the drone is", "answer": "facing", "choices": ["painted", "named", "facing"], "meaning": "Turns are relative. Left means the drone's own left, which depends on where its nose points.", "src": ["game"] },
+        { "before": "A robot arm bends at joints, like a shoulder, elbow and", "answer": "wrist", "choices": ["wrist", "nose", "hair"], "meaning": "A joint is where an arm bends or turns. The Robot Relay arm has a turning base, a shoulder, an elbow and a wrist.", "src": ["game"] },
+        { "before": "George Devol patented a robot arm that became", "answer": "Unimate", "choices": ["Robo-Max", "Unimate", "Gizmo"], "meaning": "George Devol's 1954 patent for a robot arm became the Unimate industrial robot.", "src": ["nihf-devol"] },
+        { "before": "In nineteen sixty-one it went to work in a car", "answer": "factory", "choices": ["school", "farm", "factory"], "meaning": "The first Unimate was installed at a General Motors plant in 1961.", "src": ["nihf-devol"] },
+        { "before": "It stacked hot metal parts by following its stored", "answer": "commands", "choices": ["commands", "dreams", "guesses"], "meaning": "Unimate kept its instructions one step at a time and followed them to pick up and stack hot die-cast metal parts.", "src": ["nihf-devol"] },
+        { "before": "Plan the whole program first, then press", "answer": "Run", "choices": ["Stop", "Run", "Sleep"], "meaning": "In Drone Dash you build the whole program, then press Run and watch it fly.", "src": ["game"] }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Space and inventors",
+      "topic": "The sky and inventions (Sky Seeker, Hologram Heroes)",
+      "bpm": 92,
+      "replayLimit": 2,
+      "lines": [
+        { "before": "Saturn's rings are billions of chunks of ice and", "answer": "rock", "choices": ["glass", "rock", "gold"], "meaning": "Saturn's rings are made of billions of small chunks of ice and rock coated with dust.", "src": ["nasa-saturn"] },
+        { "before": "Saturn's the sixth planet, nine times wider than", "answer": "Earth", "choices": ["Earth", "the Sun", "Jupiter"], "meaning": "Saturn is the sixth planet from the Sun and is 9 times wider than Earth.", "src": ["nasa-saturn"] },
+        { "before": "Moon craters mark the spots where asteroids and comets", "answer": "hit", "choices": ["melted", "sang", "hit"], "meaning": "Asteroids, meteoroids and comets strike the Moon. Its thin atmosphere cannot slow them, and the craters last for billions of years.", "src": ["nasa-moon"] },
+        { "before": "To find a faint star, hop there from stars that are", "answer": "bright", "choices": ["bright", "square", "loud"], "meaning": "Star-hopping uses patterns of bright stars as stepping stones to fainter targets.", "src": ["skyatnight-hop"] },
+        { "before": "Carruthers built a camera that astronauts set on the", "answer": "Moon", "choices": ["Sun", "Moon", "Mars"], "meaning": "George Carruthers invented the camera. Apollo 16 astronauts set it up on the Moon in 1972. It was the first Moon-based observatory.", "src": ["nihf-carruthers"] },
+        { "before": "It took its pictures using ultraviolet", "answer": "light", "choices": ["paint", "sound", "light"], "meaning": "The camera used ultraviolet light to photograph Earth's outer atmosphere, stars and galaxies.", "src": ["nihf-carruthers"] },
+        { "before": "Kwolek's Kevlar is five times stronger than the same weight of", "answer": "steel", "choices": ["steel", "feathers", "water"], "meaning": "Kevlar is five times stronger than the same weight of steel. It is used in ropes, canoes and bullet-resistant vests.", "src": ["nihf-kwolek"] },
+        { "before": "Patricia Bath built a laser tool to remove", "answer": "cataracts", "choices": ["freckles", "cataracts", "homework"], "meaning": "Patricia Bath invented a device that removes cataracts from the eye. Her first U.S. patent was issued in 1988.", "src": ["nihf-bath"] }
+      ]
+    }
+  ]
+}

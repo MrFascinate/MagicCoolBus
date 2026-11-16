@@ -1,0 +1,247 @@
+{
+  "_note": "All Hologram Heroes text lives here so it can be edited without touching code. Every fact is listed with its source in SOURCES.md. Living people have not given permission yet (permission: pending): keep their text short and factual, and do not add pictures of anyone.",
+  "title": "Hologram Heroes",
+  "intro": "Each round shows a real problem. Pick the invention that solved it. Then meet the inventor, and a scientist working today.",
+  "stampSkill": "Matched problems to inventions",
+  "levels": [
+    { "id": 1, "title": "Two choices", "goal": "Two rounds, two inventions to pick from.", "wrongLimit": 1, "choices": 2 },
+    { "id": 2, "title": "Three choices", "goal": "Two rounds, three inventions to pick from.", "wrongLimit": 2, "choices": 3 },
+    { "id": 3, "title": "Four choices", "goal": "Two rounds, four inventions. The problems are harder to spot.", "wrongLimit": 2, "choices": 4 }
+  ],
+  "props": {
+    "inv_robot_arm": { "label": "Unimate robot arm", "solved": "The Unimate robot arm took over lifting and stacking hot metal parts in a factory." },
+    "inv_solar_still": { "label": "Solar still", "solved": "The solar still uses sunlight to turn salt water into water that is safe to drink." },
+    "inv_electron_microscope": { "label": "Electron microscope", "solved": "The electron microscope shows things too small for a light microscope to see." },
+    "inv_kevlar": { "label": "Kevlar fiber", "solved": "Kevlar fiber is very strong for its weight, so ropes and boats can be strong and light." },
+    "inv_uv_camera": { "label": "Far ultraviolet camera", "solved": "The far ultraviolet camera took pictures of ultraviolet light from stars and gas in space." },
+    "inv_laserphaco": { "label": "Laserphaco laser probe", "solved": "Laserphaco is a laser tool for removing a cataract from the eye." },
+    "inv_foldscope": { "label": "Foldscope paper microscope", "solved": "The Foldscope is a paper microscope that costs under $1 to make, so more people can have one." },
+    "inv_3d_printer": { "label": "3D printer (stereolithography)", "solved": "This 3D printer turns a computer design into a solid part, one thin layer at a time." },
+    "inv_blue_led": { "label": "Blue LED", "solved": "Bright blue LEDs made bright, energy-saving white LED light possible." },
+    "inv_sound_star": { "label": "Space data turned into sound", "solved": "Sonification turns space data into sound, so people can study it by listening." }
+  },
+  "rounds": [
+    {
+      "id": "devol",
+      "level": 1,
+      "problem": "Factory workers had to grab and stack hot metal parts all day.",
+      "answer": "inv_robot_arm",
+      "choices": ["inv_kevlar", "inv_robot_arm"],
+      "inventor": "devol",
+      "partner": "howard"
+    },
+    {
+      "id": "telkes",
+      "level": 1,
+      "problem": "People stranded at sea were surrounded by salt water, with nothing safe to drink.",
+      "answer": "inv_solar_still",
+      "choices": ["inv_solar_still", "inv_uv_camera"],
+      "inventor": "telkes",
+      "partner": "nakamura"
+    },
+    {
+      "id": "ruska",
+      "level": 2,
+      "problem": "Even the best light microscopes could not zoom in far enough to see the tiniest things.",
+      "answer": "inv_electron_microscope",
+      "choices": ["inv_blue_led", "inv_electron_microscope", "inv_robot_arm"],
+      "inventor": "ruska",
+      "partner": "prakash"
+    },
+    {
+      "id": "kwolek",
+      "level": 2,
+      "problem": "Steel is strong but heavy. Ropes, boats and planes needed something strong and light.",
+      "answer": "inv_kevlar",
+      "choices": ["inv_3d_printer", "inv_solar_still", "inv_kevlar"],
+      "inventor": "kwolek",
+      "partner": "hull"
+    },
+    {
+      "id": "carruthers",
+      "level": 3,
+      "problem": "Scientists wanted pictures of ultraviolet light from stars and gas in space. Our eyes cannot see this kind of light.",
+      "answer": "inv_uv_camera",
+      "choices": ["inv_sound_star", "inv_electron_microscope", "inv_uv_camera", "inv_blue_led"],
+      "inventor": "carruthers",
+      "partner": "diaz_merced"
+    },
+    {
+      "id": "bath",
+      "level": 3,
+      "problem": "A cataract clouds the lens inside the eye. Eye surgeons wanted a more precise way to remove it.",
+      "answer": "inv_laserphaco",
+      "choices": ["inv_foldscope", "inv_blue_led", "inv_3d_printer", "inv_laserphaco"],
+      "inventor": "bath",
+      "partner": "ochoa"
+    }
+  ],
+  "people": {
+    "devol": {
+      "name": "George Devol",
+      "years": "1912 to 2011",
+      "living": false,
+      "role": "Inventor",
+      "invention": "Unimate robot arm",
+      "bio": [
+        "George Devol filed a patent for a robot arm in 1954.",
+        "In 1956 he and Joseph Engelberger founded Unimation. In 1961 the first Unimate arm went to work at a General Motors plant, where it followed programmed steps to stack hot metal parts."
+      ]
+    },
+    "telkes": {
+      "name": "Mária Telkes",
+      "years": "1900 to 1995",
+      "living": false,
+      "role": "Inventor",
+      "invention": "Solar still",
+      "bio": [
+        "Mária Telkes was a scientist born in Budapest, Hungary, who came to the United States in 1925.",
+        "During World War II she developed a device that uses sunlight to make salt water safe to drink. It went into the military's emergency kits."
+      ]
+    },
+    "ruska": {
+      "name": "Ernst Ruska",
+      "years": "1906 to 1988",
+      "living": false,
+      "role": "Inventor",
+      "invention": "Electron microscope",
+      "bio": [
+        "Ernst Ruska, born in Heidelberg, Germany, worked with Max Knoll to build the first electron microscope in 1931.",
+        "In 1933 Ruska built one that showed finer detail than a light microscope. In 1986 he shared the Nobel Prize in Physics for this work."
+      ]
+    },
+    "kwolek": {
+      "name": "Stephanie Kwolek",
+      "years": "1923 to 2014",
+      "living": false,
+      "role": "Inventor",
+      "invention": "Kevlar fiber",
+      "bio": [
+        "Stephanie Kwolek was a chemist at DuPont, born in New Kensington, Pennsylvania.",
+        "While looking for stronger, stiffer fibers, she discovered a new kind of material called a liquid crystalline polymer. It led to Kevlar, a fiber five times stronger than the same weight of steel."
+      ]
+    },
+    "carruthers": {
+      "name": "George Carruthers",
+      "years": "1939 to 2020",
+      "living": false,
+      "role": "Inventor",
+      "invention": "Far ultraviolet camera",
+      "bio": [
+        "George Carruthers was born in Cincinnati and built his first telescopes by the time he was 10.",
+        "At the Naval Research Laboratory he led the team that built the far ultraviolet camera. In 1972, Apollo 16 astronauts set it up on the Moon."
+      ]
+    },
+    "bath": {
+      "name": "Patricia Bath",
+      "years": "1942 to 2019",
+      "living": false,
+      "role": "Inventor",
+      "invention": "Laserphaco",
+      "bio": [
+        "Patricia Bath was an eye doctor. She finished her training as an eye doctor at New York University.",
+        "In 1981 she came up with Laserphaco, a laser tool and method for removing cataracts. She received a U.S. patent for it in 1988."
+      ]
+    },
+    "howard": {
+      "name": "Ayanna Howard",
+      "living": true,
+      "permission": "pending",
+      "field": "Roboticist",
+      "prop": "inv_robot_arm",
+      "why": "Factory robot arms grew into robots that help people, including kids.",
+      "work": [
+        "President of Spelman College.",
+        "Co-founded Zyrobotics, which makes learning tech for children with special needs."
+      ],
+      "firstSteps": [
+        "Started her career as a robotics researcher at NASA's Jet Propulsion Laboratory.",
+        "Co-founded Black in Robotics."
+      ],
+      "yourStep": "Write step-by-step directions for a simple task, like making a sandwich. Ask a friend to follow them exactly. Robots need directions that are just as clear."
+    },
+    "nakamura": {
+      "name": "Shuji Nakamura",
+      "living": true,
+      "permission": "pending",
+      "field": "Materials scientist",
+      "prop": "inv_blue_led",
+      "why": "Both made light and energy do useful work.",
+      "work": [
+        "Professor at the University of California, Santa Barbara.",
+        "Shared the 2014 Nobel Prize in Physics with Isamu Akasaki and Hiroshi Amano for efficient blue LEDs. Their work made bright, energy-saving white light possible."
+      ],
+      "firstSteps": [
+        "Born in Ikata, Japan, in 1954."
+      ],
+      "yourStep": "Look at a white light through the shiny side of an old CD. You may see that white light holds many colors."
+    },
+    "prakash": {
+      "name": "Manu Prakash",
+      "living": true,
+      "permission": "pending",
+      "field": "Bioengineer at Stanford University",
+      "prop": "inv_foldscope",
+      "why": "The biggest microscope meets one made of paper.",
+      "work": [
+        "Co-invented the Foldscope, a folded-paper microscope that costs under $1 to make. His co-inventors on its patent are James Cybulski and James Clements.",
+        "Co-founded Foldscope Instruments."
+      ],
+      "firstSteps": [
+        "Earned degrees at the Indian Institute of Technology in India and at MIT."
+      ],
+      "yourStep": "Put one drop of water on clear plastic wrap over a printed page. Look through the drop. It works like a tiny lens."
+    },
+    "hull": {
+      "name": "Chuck Hull",
+      "living": true,
+      "permission": "pending",
+      "field": "Inventor of stereolithography 3D printing",
+      "prop": "inv_3d_printer",
+      "why": "Both turned liquid chemicals into strong, solid things.",
+      "work": [
+        "Invented stereolithography, one way to 3D print. UV light hardens liquid resin one thin layer at a time.",
+        "Co-founded 3D Systems in 1986."
+      ],
+      "firstSteps": [
+        "Born in 1939.",
+        "In 1983 his method made its first part, a small eye wash cup."
+      ],
+      "yourStep": "Build a small shape by stacking thin layers of paper or clay, one on top of the next. That is how a 3D printer builds things."
+    },
+    "diaz_merced": {
+      "name": "Wanda Díaz-Merced",
+      "living": true,
+      "permission": "pending",
+      "field": "Astronomer",
+      "prop": "inv_sound_star",
+      "why": "Both study the sky with more than eyesight.",
+      "work": [
+        "Turns space data into sound. This is called sonification.",
+        "Speaks widely about using sound to study space."
+      ],
+      "firstSteps": [
+        "Born in Gurabo, Puerto Rico.",
+        "As a student, did an internship at NASA's Goddard Space Flight Center. There she helped build early tools to study space data turned into sound."
+      ],
+      "yourStep": "Write down the temperature each hour for one day. Turn each number into a note: a higher number gets a higher note. Listen to your day."
+    },
+    "ochoa": {
+      "name": "Ellen Ochoa",
+      "living": true,
+      "permission": "pending",
+      "field": "Optics engineer and former astronaut",
+      "prop": "inv_laserphaco",
+      "why": "Both used light to help people, and machines, see.",
+      "work": [
+        "Co-inventor on three patents for optical systems, including ways for machines to recognize objects.",
+        "Flew in space four times and later directed NASA's Johnson Space Center."
+      ],
+      "firstSteps": [
+        "Born in Los Angeles, California, in 1958.",
+        "In 1993 she became the first Hispanic woman in space."
+      ],
+      "yourStep": "Put a pencil in a clear glass of water and look from the side. The pencil seems to bend, because light changes direction when it goes from water to air."
+    }
+  }
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "avatar_01",
+    "file": "avatar_01.glb",
+    "portrait": "portrait_01.webp",
+    "height_m": 1.56,
+    "label": "Explorer 1"
+  },
+  {
+    "id": "avatar_02",
+    "file": "avatar_02.glb",
+    "portrait": "portrait_02.webp",
+    "height_m": 1.66,
+    "label": "Explorer 2"
+  },
+  {
+    "id": "avatar_03",
+    "file": "avatar_03.glb",
+    "portrait": "portrait_03.webp",
+    "height_m": 1.59,
+    "label": "Explorer 3"
+  },
+  {
+    "id": "avatar_04",
+    "file": "avatar_04.glb",
+    "portrait": "portrait_04.webp",
+    "height_m": 1.56,
+    "label": "Explorer 4"
+  },
+  {
+    "id": "avatar_05",
+    "file": "avatar_05.glb",
+    "portrait": "portrait_05.webp",
+    "height_m": 1.51,
+    "label": "Explorer 5"
+  },
+  {
+    "id": "avatar_06",
+    "file": "avatar_06.glb",
+    "portrait": "portrait_06.webp",
+    "height_m": 1.62,
+    "label": "Explorer 6"
+  },
+  {
+    "id": "avatar_07",
+    "file": "avatar_07.glb",
+    "portrait": "portrait_07.webp",
+    "height_m": 1.58,
+    "label": "Explorer 7"
+  },
+  {
+    "id": "avatar_08",
+    "file": "avatar_08.glb",
+    "portrait": "portrait_08.webp",
+    "height_m": 1.5,
+    "label": "Explorer 8"
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "name": "magic-cool-bus-challenge",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "postinstall": "node scripts/copy-draco.mjs",
+    "prebuild": "node scripts/copy-draco.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:all": "node scripts/smoke-all.mjs"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "draco3dgltf": "^1.5.9",
+    "playwright-core": "^1.65.1",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}
