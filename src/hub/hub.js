@@ -12,6 +12,13 @@ import { REQUIRED_MARKERS, STATION_IDS } from './markers.js';
 export const KEEP = /^(walk_area|ring_|station_|cam_|spawn_|pad_|drone_start|stage_center|CAGE_|MCB_Pad|MCB_Cage|DR_|arm_base$|part_tray$|bin_\d$|barrier_\d$|holo_center$|print_bed$|MCB_AR_(Table|Top)$|MCB_SideCanopy$|MCB_CanopyLight\d$|MCB_Logo_Canopy$|MCB_Scope_Tube$|RB_(J1|Base|Part|Bin\d|Barrier|Tray)$)/;
 
 /**
+ * Roots of the opened-up bus and the station props around it. Drive the Bus
+ * hides these (and shows a closed bus instead), so they are merged apart
+ * from the street and the school.
+ */
+export const BUS_SET = /^(MCB_Rig|MCB_Pad\d|CAGE_|RB_Bin\d|RB_Barrier|STG_)/;
+
+/**
  * @typedef {Object} Hub
  * @property {THREE.Group} root
  * @property {NavGrid} nav
@@ -21,7 +28,16 @@ export const KEEP = /^(walk_area|ring_|station_|cam_|spawn_|pad_|drone_start|sta
  * @property {(names:string[], visible:boolean)=>void} setVisible
  * @property {string[]} missing  required marker names not found
  * @property {number} drawCalls  approximate mesh count after merging
+ * @property {THREE.Object3D[]} busSet  the opened bus and its station props (roots and merged meshes)
+ * @property {(material:string)=>THREE.Mesh[]} mergedByMaterial  merged street and school meshes using that material
  */
+
+/** True if o hangs under one of the BUS_SET roots (a direct child of the glTF scene). */
+function inBusSet(o) {
+  let top = o;
+  while (top.parent && top.parent.parent) top = top.parent;
+  return BUS_SET.test(top.name || '');
+}
 
 function keepNode(o) {
   for (let p = o; p; p = p.parent) if (p.name && KEEP.test(p.name)) return true;
@@ -82,8 +98,9 @@ export async function loadHub(onProgress) {
     g.applyMatrix4(o.matrixWorld);
     for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv', 'color'].includes(k)) g.deleteAttribute(k);
     const mat = toLambert(o.material, matCache);
-    const key = mat.uuid + '#' + geomKey(g);
-    if (!groups.has(key)) groups.set(key, { mat, geos: [] });
+    const bus = inBusSet(o);
+    const key = (bus ? 'bus#' : '') + mat.uuid + '#' + geomKey(g);
+    if (!groups.has(key)) groups.set(key, { mat, geos: [], bus });
     groups.get(key).geos.push(g);
     toRemove.push(o);
   });
@@ -93,19 +110,21 @@ export async function loadHub(onProgress) {
   }
   const merged = new THREE.Group();
   merged.name = 'hub_merged';
-  for (const { mat, geos } of groups.values()) {
+  const mergedBus = new THREE.Group();
+  mergedBus.name = 'hub_merged_bus';
+  for (const { mat, geos, bus } of groups.values()) {
     const g = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
     if (!g) continue;
     for (const x of geos) if (x !== g) x.dispose();
     const mesh = new THREE.Mesh(g, mat);
     mesh.matrixAutoUpdate = false;
-    merged.add(mesh);
+    (bus ? mergedBus : merged).add(mesh);
   }
   // Drop empty branches left behind, keeping named markers.
   const empties = [];
   root.traverse((o) => { if (o !== root && !o.isMesh && o.children.length === 0 && !keepNode(o) && !o.isLight && !o.isCamera) empties.push(o); });
   for (const o of empties) o.removeFromParent();
-  root.add(merged);
+  root.add(merged, mergedBus);
   root.traverse((o) => { if (o.isLight) o.visible = false; });
 
   /** @type {Map<string, THREE.Object3D>} */
@@ -142,10 +161,14 @@ export async function loadHub(onProgress) {
 
   const tmpQ = new THREE.Quaternion();
   const camFix = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+  // the glTF scene's nodes are root's children
+  const busSet = [mergedBus, ...root.children.filter((c) => BUS_SET.test(c.name || ''))];
   const hub = {
     root,
     nav,
     missing,
+    busSet,
+    mergedByMaterial: (name) => merged.children.filter((m) => m.material?.name === name),
     drawCalls: 0,
     get: (name) => byName.get(name) || null,
     pos(name) {

@@ -1,6 +1,6 @@
 # The Magic Cool Bus Challenge
 
-A browser game from Fascinate Inc. Players pick a character, walk around a mobile STEM lab parked outside a middle school, and play a science game at each station. Six stamps unlock the last station, where they design a badge.
+A browser game from Fascinate Inc. Players pick a character, walk around a mobile STEM lab parked outside a middle school, and play a science game at each station. Six stamps unlock the last station, where they design a badge. Finishing the badge unlocks a free drive around the block in the bus.
 
 ## Stations
 
@@ -37,7 +37,7 @@ Other commands:
 
 ## Status
 
-All seven stations are built and pass an automated end-to-end run. The game has not yet been tested on a real Chromebook or with children.
+All seven stations and the Drive the Bus finale are built and pass an automated end-to-end run. The game has not yet been tested on a real Chromebook or with children.
 
 Placeholders that still need a human:
 

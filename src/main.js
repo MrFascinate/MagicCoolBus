@@ -3,7 +3,7 @@ import './ui/style.css';
 import { loadHub } from './hub/hub.js';
 import { PlayerController, FollowCamera } from './hub/player.js';
 import { loadRoster, createAvatar } from './avatars/roster.js';
-import { createSave } from './core/save.js';
+import { createSave, isDriveUnlocked } from './core/save.js';
 import { createSound } from './core/sound.js';
 import { reducedMotion, DEBUG } from './core/env.js';
 import { loadGLTF } from './core/loaders.js';
@@ -12,9 +12,13 @@ import { h, clear, announce } from './ui/dom.js';
 import { icon, ICONS } from './ui/icons.js';
 import { EMBLEMS } from './ui/emblems.js';
 
-/** @typedef {'loading'|'select'|'hub'|'station'} Mode */
+/** @typedef {'loading'|'select'|'hub'|'station'|'drive'} Mode */
 
 const RING_RADIUS = 0.6;
+/** Drive the Bus: the marked spot on the walk outside the bus's front door, and where the parked bus sits. */
+const DRIVE_SPOT = { x: 4.78, z: 2.75 };
+const DOOR_STEP = { x: 4.78, z: 1.45 };
+const BUS_PARKED = { x: 0.059, z: 0, h: Math.PI / 2 };
 const ui = /** @type {HTMLElement} */ (document.getElementById('ui'));
 const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('view'));
 const save = createSave();
@@ -161,7 +165,8 @@ function buildHud() {
   hud.panelBack = h('button.back-btn', { type: 'button', onclick: () => exitStation() }, icon('back'), h('span', { text: 'Back to the bus' }));
   hud.panel = h('aside#station-panel', { hidden: true, 'aria-label': 'Station' }, h('div.panel-top', null, hud.panelBack), hud.panelBody);
   hud.overlay = h('div.overlay', { hidden: true });
-  ui.append(hud.passport, hud.top, hud.prompt, hud.hint, hud.panel, hud.overlay);
+  hud.toast = h('div.toast', { hidden: true, role: 'status' });
+  ui.append(hud.passport, hud.top, hud.prompt, hud.hint, hud.toast, hud.panel, hud.overlay);
   refreshHud();
 }
 
@@ -186,6 +191,13 @@ function refreshHud() {
       h('span.pl-text', null, h('strong', { text: s.title }), h('span', { text: status })),
       h('button', { type: 'button', onclick: () => { togglePassport(); walkToStation(s.id); } }, h('span', { text: 'Walk there' }))));
   }
+  if (isDriveUnlocked(save.data)) {
+    hud.passportList.append(h('li', null,
+      h('span.pl-icon', { html: BUS_ICON }),
+      h('span.pl-text', null, h('strong', { text: 'Drive the bus' }), h('span', { text: 'Ready to drive' })),
+      h('button', { type: 'button', onclick: () => { togglePassport(); walkToStation('drive'); } }, h('span', { text: 'Walk there' }))));
+  }
+  refreshDriveSpot();
   clear(hud.soundBtn);
   hud.soundBtn.append(icon(sound.on ? 'soundOn' : 'soundOff'), h('span.btn-text', { text: sound.on ? 'Sound on' : 'Sound off' }));
   hud.soundBtn.setAttribute('aria-pressed', sound.on ? 'true' : 'false');
@@ -220,17 +232,27 @@ function toggleRun() {
 
 function setPaused(v) {
   paused = v;
-  if (!v) { hud.overlay.hidden = true; clear(hud.overlay); (mode === 'station' ? hud.panelBody.querySelector('button') : hud.prompt.querySelector('button'))?.focus(); return; }
+  drive?.clearInput();
+  if (!v) {
+    hud.overlay.hidden = true; clear(hud.overlay);
+    if (mode === 'drive') /** @type {HTMLElement|null} */ (document.querySelector('.drive-hud'))?.focus();
+    else (mode === 'station' ? hud.panelBody.querySelector('button') : hud.prompt.querySelector('button'))?.focus();
+    return;
+  }
   clear(hud.overlay);
   hud.overlay.hidden = false;
-  const resume = h('button.primary', { type: 'button', onclick: () => setPaused(false) }, h('span', { text: 'Keep playing' }));
+  const driving = mode === 'drive';
+  const resume = h('button.primary', { type: 'button', onclick: () => setPaused(false) }, h('span', { text: driving ? 'Keep driving' : 'Keep playing' }));
   hud.overlay.append(h('div.card', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Paused' },
     h('h2', { text: 'Paused' }),
     h('p', { text: 'Your progress is kept.' }),
-    h('p', { text: 'To walk, click or tap the ground, or use the arrow keys or W A S D. To run, double-click or double-tap, hold Shift with the keys, or turn on the Run button. Stand in a ring and press Enter or Space, or tap Play.' }),
+    h('p', { text: driving
+      ? 'To drive, use the arrow keys or W A S D. Up goes, down backs up, left and right steer. Space brakes and H honks. On a touch screen, use the buttons.'
+      : 'To walk, click or tap the ground, or use the arrow keys or W A S D. To run, double-click or double-tap, hold Shift with the keys, or turn on the Run button. Stand in a ring and press Enter or Space, or tap Play.' }),
     h('div.actions', null, resume,
       h('button', { type: 'button', onclick: () => { toggleSound(); setPaused(true); } }, h('span', { text: sound.on ? 'Turn sound off' : 'Turn sound on' })),
-      mode === 'station' ? h('button', { type: 'button', onclick: () => { setPaused(false); exitStation(); } }, h('span', { text: 'Leave this station' })) : null)));
+      mode === 'station' ? h('button', { type: 'button', onclick: () => { setPaused(false); exitStation(); } }, h('span', { text: 'Leave this station' })) : null,
+      driving ? h('button', { type: 'button', onclick: () => { setPaused(false); exitDrive(); } }, h('span', { text: 'Park and get out' })) : null)));
   resume.focus();
 }
 
@@ -277,7 +299,10 @@ function drawLabel(l, title, sub, mark) {
   l.tex.needsUpdate = true;
 }
 /** Ring labels draw without depth testing, so they show through walls. Hide them in stations. */
-function setRingLabelsVisible(v) { for (const l of ringLabels.values()) l.sp.visible = v; }
+function setRingLabelsVisible(v) {
+  for (const l of ringLabels.values()) l.sp.visible = v;
+  if (driveSpot?.label) driveSpot.label.visible = v;
+}
 function updateRingLabels() {
   if (!hub) return;
   const n = stampCount();
@@ -312,9 +337,17 @@ function updatePrompt(id) {
   if (id) ringEnteredAt = performance.now();
   clear(hud.prompt);
   if (!id) { hud.prompt.hidden = true; return; }
+  hud.prompt.hidden = false;
+  if (id === 'drive') {
+    hud.prompt.append(
+      h('span.prompt-title', { text: 'Drive the bus' }),
+      h('button.primary', { type: 'button', onclick: () => startDrive() }, icon('play'), h('span', { text: 'Drive' })),
+      h('span.prompt-keys', { text: 'or press Enter' }));
+    announce('Drive the bus. Press Enter or Space, or tap Drive.');
+    return;
+  }
   const def = STATIONS.find((s) => s.id === id);
   const n = stampCount();
-  hud.prompt.hidden = false;
   if (id === 'badge' && n < 6) {
     hud.prompt.append(icon('lock'), h('span', { text: `Badge Builder is locked. You have ${n} of 6 stamps. Earn all six to open it.` }));
     announce(`Badge Builder is locked. ${n} of 6 stamps.`);
@@ -354,7 +387,7 @@ function readKeys() {
 window.addEventListener('keydown', (e) => {
   shiftHeld = e.shiftKey;
   if (mode === 'loading' || mode === 'select') return;
-  if (e.key === 'Escape' || (e.key.toLowerCase() === 'p' && mode === 'hub')) {
+  if (e.key === 'Escape' || (e.key.toLowerCase() === 'p' && (mode === 'hub' || mode === 'drive'))) {
     if (!hud.overlay.hidden && !paused) return; // stamp card open
     setPaused(!paused);
     e.preventDefault();
@@ -417,6 +450,7 @@ canvas.addEventListener('pointerup', (e) => {
 // ---------- stations ----------
 let entering = false;
 async function enterStation(id) {
+  if (id === 'drive') return startDrive();
   if (mode !== 'hub' || entering || paused) return;
   const def = STATIONS.find((s) => s.id === id);
   if (!def) return;
@@ -437,6 +471,7 @@ async function enterStation(id) {
   }
   stationDef = def;
   mode = 'station';
+  hud.toast.hidden = true;
   hud.prompt.hidden = true; hud.hint.hidden = true; hud.passport.hidden = true; hud.runBtn.hidden = true;
   hud.panel.hidden = false;
   setRingLabelsVisible(false);
@@ -504,6 +539,136 @@ function exitStation() {
   stationDef = null;
   updatePrompt(id ? ringAtFast(player.position.x, player.position.z) : null);
   hud.prompt.querySelector('button')?.focus();
+  maybeTellDriveReady();
+}
+
+// ---------- Drive the Bus (finale) ----------
+const BUS_ICON = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="15" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M3 15h26M10 7v8M17 7v8M24 7v8" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="24" r="3" fill="currentColor"/><circle cx="23" cy="24" r="3" fill="currentColor"/></svg>';
+/** @type {{ring:THREE.Object3D|null, label:THREE.Sprite}|null} */ let driveSpot = null;
+/** @type {any} */ let drive = null;
+let leavingDrive = false;
+const fadeEl = h('div.fade', { 'aria-hidden': 'true' });
+document.getElementById('app')?.append(fadeEl);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+async function fade(on) {
+  fadeEl.classList.toggle('on', on);
+  await wait(reduced ? 30 : 340);
+}
+
+/** Once the badge is built, a marked spot appears by the bus door. Never shown before. */
+function refreshDriveSpot() {
+  if (driveSpot || !hub || !isDriveUnlocked(save.data)) return;
+  let p = { x: DRIVE_SPOT.x, z: DRIVE_SPOT.z };
+  if (!hub.nav.isWalkable(p.x, p.z)) p = hub.nav.nearestWalkable(p.x, p.z) || p;
+  const src = hub.get('ring_badge');
+  let ring = null;
+  if (src) {
+    ring = src.clone();
+    ring.name = 'ring_drive';
+    ring.position.set(p.x, src.position.y, p.z);
+    hub.root.add(ring);
+  }
+  const l = makeLabelSprite();
+  drawLabel(l, 'Drive the bus', null, null);
+  l.sp.position.set(p.x, 1.95, p.z);
+  l.sp.name = 'label_drive';
+  l.sp.visible = mode !== 'station' && mode !== 'drive';
+  hub.root.add(l.sp);
+  driveSpot = { ring, label: l.sp, tex: l.tex };
+  ringPos.set('drive', new THREE.Vector3(p.x, 0, p.z));
+}
+
+function showToast(text) {
+  clear(hud.toast);
+  const ok = h('button', { type: 'button', onclick: () => { hud.toast.hidden = true; } }, h('span', { text: 'OK' }));
+  hud.toast.append(h('span.toast-icon', { html: BUS_ICON }), h('p', { text }), ok);
+  hud.toast.hidden = false;
+}
+
+/** Tell the player once, after the badge is first built, that the bus is ready. */
+function maybeTellDriveReady() {
+  if (!isDriveUnlocked(save.data) || save.flag('driveReady')) return;
+  save.setFlag('driveReady');
+  refreshDriveSpot();
+  showToast('Your badge is done. The bus is ready to drive. Find the new ring by the bus door.');
+}
+
+async function startDrive() {
+  if (mode !== 'hub' || entering || paused || !driveSpot) return;
+  entering = true;
+  sound.play('click');
+  keysDown.clear();
+  player.stop();
+  avatar.play('idle');
+  mode = 'drive';
+  hud.prompt.hidden = true; hud.hint.hidden = true; hud.passport.hidden = true; hud.runBtn.hidden = true; hud.toast.hidden = true;
+  hud.passportList.hidden = true; hud.passportBtn.setAttribute('aria-expanded', 'false');
+  const note = h('p.drive-loading', { role: 'status', text: 'Getting the bus ready...' });
+  ui.append(note);
+  let d = null;
+  try {
+    const mod = await import('./drive/index.js');
+    d = mod.default();
+    const hide = [...hub.busSet, ...STATIONS.map((s) => hub.get(`ring_${s.id}`)).filter(Boolean),
+      ...hub.mergedByMaterial('G_RowHouses'), avatar.root];
+    if (driveSpot.ring) hide.push(driveSpot.ring);
+    await d.load({
+      scene, camera, ui, sound, reducedMotion: reduced,
+      loadGLTF: (url) => loadGLTF(url),
+      hide, start: BUS_PARKED,
+      isPaused: () => paused,
+      onPark: () => exitDrive(),
+    });
+    await fade(true);
+    setRingLabelsVisible(false);
+    d.start();
+    drive = d;
+    note.remove();
+    await fade(false);
+  } catch (err) {
+    console.error(err);
+    try { d?.dispose(); } catch { /* nothing to free */ }
+    drive = null;
+    note.remove();
+    backToHub();
+    fadeEl.classList.remove('on');
+    showToast('The bus could not load. You are back at the bus door.');
+  } finally {
+    entering = false;
+  }
+}
+
+/** Hub HUD and labels back, after a drive. */
+function backToHub() {
+  mode = 'hub';
+  setRingLabelsVisible(true);
+  hud.passport.hidden = false;
+  hud.runBtn.hidden = false;
+  avatar.root.visible = true;
+  resize();
+  follow.snap(player.position);
+  refreshHud();
+}
+
+async function exitDrive() {
+  if (mode !== 'drive' || !drive || leavingDrive) return;
+  leavingDrive = true;
+  if (paused) { paused = false; hud.overlay.hidden = true; clear(hud.overlay); }
+  sound.play('click');
+  await fade(true);
+  try { drive.dispose(); } catch (e) { console.error(e); }
+  drive = null;
+  // step out of the door and onto the walk, just past the drive spot
+  player.place(DOOR_STEP.x, DOOR_STEP.z, 0);
+  const spot = ringPos.get('drive') || DRIVE_SPOT;
+  player.walkTo(spot.x, spot.z + RING_RADIUS + 0.35);
+  backToHub();
+  nearRing = null;
+  hud.prompt.hidden = true;
+  await fade(false);
+  leavingDrive = false;
+  /** @type {HTMLElement} */ (document.activeElement)?.blur?.();
+  announce('You parked the bus and got out.');
 }
 
 // ---------- loop ----------
@@ -522,6 +687,8 @@ function tick() {
     } else if (mode === 'station') {
       avatar.update(dt);
       station?.update?.(dt);
+    } else if (mode === 'drive') {
+      drive?.update(dt);
     } else if (mode === 'select' && !reduced) {
       const t = performance.now() * 0.00005;
       camera.position.set(1.5 + Math.sin(t) * 8, 6, 15 + Math.cos(t) * 4);
@@ -565,6 +732,7 @@ async function boot() {
   mode = 'hub';
   resize();
   announce('You are outside the bus. Walk to a glowing ring to play a station.');
+  maybeTellDriveReady();
   if (DEBUG) {
     window.__mcb = {
       get mode() { return mode; }, get fps() { return fps; }, get nearRing() { return nearRing; },
@@ -575,6 +743,9 @@ async function boot() {
       player: () => ({ x: player.position.x, z: player.position.z }),
       walkTo: (x, z) => player.walkTo(x, z),
       walkToStation, info: () => renderer.info.render, mem: () => ({ ...renderer.info.memory }),
+      get drive() { return drive?.debug || null; },
+      startDrive, exitDrive,
+      get driveSpot() { return !!driveSpot; },
     };
   }
 }

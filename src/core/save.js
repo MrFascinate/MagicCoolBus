@@ -19,6 +19,14 @@ export function sanitizeBadge(v) {
   return out;
 }
 
+/**
+ * Drive the Bus opens once the badge is finished in Badge Builder.
+ * @param {{badge:any}} data
+ */
+export function isDriveUnlocked(data) {
+  return !!(data && data.badge && data.badge.done === true);
+}
+
 /** @typedef {{levels: Record<string, number>, stamp: null | {skill: string}}} StationSave */
 /**
  * @typedef {Object} SaveData
@@ -27,11 +35,12 @@ export function sanitizeBadge(v) {
  * @property {boolean} sound
  * @property {Record<string, StationSave>} stations
  * @property {any} badge
+ * @property {Record<string, boolean>} flags  one-time notes already shown (driveReady)
  */
 
 /** @returns {SaveData} */
 export function defaults() {
-  return { v: 1, character: null, sound: true, stations: {}, badge: null };
+  return { v: 1, character: null, sound: true, stations: {}, badge: null, flags: {} };
 }
 
 /** Memory-backed object with the Storage methods we use. */
@@ -77,6 +86,9 @@ export function sanitize(raw) {
     }
   }
   d.badge = sanitizeBadge(raw.badge);
+  if (raw.flags && typeof raw.flags === 'object') {
+    for (const [k, v] of Object.entries(raw.flags)) if (v === true && /^[a-zA-Z]{1,24}$/.test(k)) d.flags[k] = true;
+  }
   return d;
 }
 
@@ -150,6 +162,9 @@ export function createSave(opts = {}) {
     /** The saved badge (design, code, done) or null. */
     getBadge() { return data.badge; },
     setBadge(badge) { data.badge = sanitizeBadge(badge); write(); },
+    /** One-time notes: true once shown. */
+    flag(name) { return !!data.flags[name]; },
+    setFlag(name) { data.flags[name] = true; write(); },
     reset() { data = defaults(); write(); },
   };
 }

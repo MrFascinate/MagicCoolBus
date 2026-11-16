@@ -36,6 +36,8 @@ export function createSound(initialOn = true) {
   };
   return {
     get on() { return on; },
+    /** The shared AudioContext when sound is on, for modules that make their own sounds; null when off. */
+    audio() { return ensure(); },
     set on(v) { on = !!v; if (on) ensure(); },
     /** @param {SoundName} name */
     play(name) {
