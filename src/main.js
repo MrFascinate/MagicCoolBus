@@ -40,6 +40,7 @@ let paused = false;
 /** @type {import('./hub/hub.js').Hub} */ let hub;
 /** @type {PlayerController} */ let player;
 /** @type {import('./avatars/roster.js').Avatar} */ let avatar;
+/** @type {import('./avatars/roster.js').RosterEntry|null} the picked character */ let character = null;
 /** @type {FollowCamera} */ let follow;
 /** @type {import('./stations/registry.js').StationModule|null} */ let station = null;
 /** @type {import('./stations/registry.js').StationDef|null} */ let stationDef = null;
@@ -147,6 +148,13 @@ function loadingScreen() {
   };
 }
 
+/** Card name. "Explorer 10" splits so small screens can show just the number (the word stays for screen readers). */
+function charName(label) {
+  const m = /^(.*\S)\s+(\d+)$/.exec(label);
+  if (!m) return h('span.char-name', { text: label });
+  return h('span.char-name', null, h('span.char-word', { text: `${m[1]} ` }), h('span.char-num', { text: m[2] }));
+}
+
 /** Title and character select on one screen (the brief makes it the first screen). */
 function selectScreen(roster) {
   return new Promise((resolve) => {
@@ -156,7 +164,7 @@ function selectScreen(roster) {
     const cards = roster.map((r, i) => {
       const b = h('button.char', { type: 'button', role: 'radio', 'aria-checked': chosen?.id === r.id ? 'true' : 'false', 'data-id': r.id, tabindex: (chosen ? chosen.id === r.id : i === 0) ? '0' : '-1' },
         h('img', { src: r.portrait, alt: '', width: '128', height: '128' }),
-        h('span.char-name', { text: r.label }),
+        charName(r.label),
         h('span.char-check', { 'aria-hidden': 'true' }, icon('check')));
       b.addEventListener('click', () => pick(r));
       b.addEventListener('keydown', (e) => {
@@ -755,6 +763,7 @@ async function startDrive() {
       scene, camera, ui, sound, reducedMotion: reduced,
       loadGLTF: (url) => loadGLTF(url),
       hide, start: BUS_PARKED,
+      driver: character ? { portrait: character.portrait, label: character.label } : null,
       isPaused: () => paused,
       onPark: () => exitDrive(),
     });
@@ -866,6 +875,7 @@ async function boot() {
   setMode('select');
   renderer.setAnimationLoop(tick);
   const entry = await selectScreen(roster);
+  character = entry;
   save.setCharacter(entry.id);
   sound.play('click');
   avatar = await createAvatar(entry, { reduced });
@@ -900,6 +910,7 @@ async function boot() {
       get pixelRatio() { return renderer.getPixelRatio(); },
       get drive() { return drive?.debug || null; },
       startDrive, exitDrive,
+      playAvatar: (n) => avatar.play(n), get avatarRoot() { return avatar.root; }, get character() { return character?.id; },
       get driveSpot() { return !!driveSpot; },
     };
   }

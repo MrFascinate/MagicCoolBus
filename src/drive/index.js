@@ -22,6 +22,7 @@ import { buildWorld } from './world.js';
  * @property {{x:number, z:number, h:number}} start   where the hub's bus is parked
  * @property {() => boolean} isPaused
  * @property {() => void} onPark              the player pressed Park and get out
+ * @property {{portrait:string, label:string}|null} [driver]  the picked character, shown as a driver badge
  */
 
 const WHEELS = ['wheel_front_left', 'wheel_front_right', 'wheel_rear_left_a', 'wheel_rear_left_b', 'wheel_rear_right_a', 'wheel_rear_right_b'];
@@ -181,8 +182,12 @@ export default function createDrive() {
     hud.pedals = h('div.dr-pedals', null,
       pad('dr-horn', 'Horn', SVG.horn, 'horn'), pad('dr-go', 'Go', SVG.up, 'up'),
       pad('dr-brake', 'Brake', SVG.brake, 'brake'), pad('dr-back', 'Back', SVG.down, 'down'));
+    // the bus has no windows, so the player's character rides along as a driver badge
+    hud.driver = ctx.driver?.portrait
+      ? h('div.dr-driver', null, h('img', { src: ctx.driver.portrait, alt: `${ctx.driver.label} is driving`, width: '64', height: '64' }))
+      : null;
     hud.root = h('div.drive-hud', { role: 'region', 'aria-label': 'Driving the bus', tabindex: '-1' },
-      hud.park, hud.help, hud.status, hud.beep, hud.steer, hud.pedals);
+      hud.park, ...(hud.driver ? [hud.driver] : []), hud.help, hud.status, hud.beep, hud.steer, hud.pedals);
     ctx.ui.append(hud.root);
     hud.root.focus({ preventScroll: true });
   }

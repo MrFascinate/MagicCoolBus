@@ -190,3 +190,4 @@ try {
   await browser.close();
   server.kill();
 }
+process.exit(process.exitCode ?? 0); // the preview server's pipes would keep Node alive

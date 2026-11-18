@@ -2,6 +2,8 @@
 .drive-hud { position: absolute; inset: 0; pointer-events: none !important; outline: none; }
 .drive-hud > * { pointer-events: auto; }
 .dr-park { position: absolute; top: calc(10px + var(--sa-t)); left: calc(10px + var(--sa-l)); font-size: 18px; padding: 8px 16px; min-height: 52px; }
+.dr-driver { position: absolute; top: calc(72px + var(--sa-t)); left: calc(10px + var(--sa-l)); width: 64px; height: 64px; border-radius: 50%; overflow: hidden; border: 3px solid var(--navy); background: var(--soft); pointer-events: none !important; }
+.dr-driver img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .dr-park .dr-ico { width: 26px; height: 26px; display: inline-flex; }
 .dr-ico svg { width: 100%; height: 100%; }
 .dr-help { position: absolute; left: 50%; top: calc(74px + var(--sa-t)); transform: translateX(-50%); margin: 0; max-width: min(560px, calc(100vw - 420px)); background: rgba(15,27,61,0.85); color: #fff; padding: 8px 14px; border-radius: 10px; text-align: center; font-size: 16px; pointer-events: none !important; }
@@ -23,6 +25,7 @@
   .dr-pedals { right: calc(10px + var(--sa-r)); bottom: calc(10px + var(--sa-b)); gap: 8px; }
   .dr-help { display: none; }
   .dr-park { font-size: 16px; min-height: 46px; padding: 6px 12px; }
+  .dr-driver { top: calc(64px + var(--sa-t)); width: 52px; height: 52px; }
   .dr-status { top: calc(64px + var(--sa-t)); font-size: 16px; max-width: calc(100% - 260px - var(--sa-l) - var(--sa-r)); }
 }
 /* phones held upright: smaller pads so both groups fit side by side under the thumbs */
@@ -34,6 +37,7 @@
   .dr-help { display: none; }
   .dr-status { top: calc(132px + var(--sa-t)); left: calc(10px + var(--sa-l)); right: calc(66px + var(--sa-r)); transform: none; max-width: none; font-size: 16px; }
   .dr-park { font-size: 16px; }
+  .dr-driver { width: 54px; height: 54px; top: calc(70px + var(--sa-t)); }
 }
 @media (pointer: coarse) { .dr-help { display: none; } }
 @media (prefers-reduced-motion: reduce) { .dr-pad.down { transform: none; } }

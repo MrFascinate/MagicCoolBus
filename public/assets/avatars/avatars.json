@@ -54,5 +54,19 @@
     "portrait": "portrait_08.webp",
     "height_m": 1.5,
     "label": "Explorer 8"
+  },
+  {
+    "id": "avatar_09",
+    "file": "avatar_09.glb",
+    "portrait": "portrait_09.webp",
+    "height_m": 1.47,
+    "label": "Explorer 9"
+  },
+  {
+    "id": "avatar_10",
+    "file": "avatar_10.glb",
+    "portrait": "portrait_10.webp",
+    "height_m": 1.56,
+    "label": "Explorer 10"
   }
 ]
